@@ -29,6 +29,7 @@ def process_file():
     
     with open(file_path, 'r') as file:
         string_list = file.readlines()
+        text_box.insert(tk.END, ''.join(string_list))
     
     # Formatta le stringhe
     formatted_strings = format_strings(string_list)
@@ -44,22 +45,34 @@ def process_file():
         for value in values:
             tree.insert(parent, tk.END, text=value)
 
+
 # Questa funzione crea e configura la finestra principale dell'applicazione,
-# aggiunge un pulsante per selezionare un file e una Treeview per visualizzare
+# aggiunge un menu per selezionare un file e una Treeview per visualizzare
 # l'output formattato, e avvia il loop principale dell'interfaccia grafica.
 def create_main_window():
     window = tk.Tk()
     window.title("EVA-DTS READER")
     window.geometry("800x600")
 
-    file_button = tk.Button(window, text="Seleziona File", command=process_file)
-    file_button.pack(pady=5)
+    # Creazione del menu
+    menu_bar = tk.Menu(window)
+    file_menu = tk.Menu(menu_bar, tearoff=0)
+    file_menu.add_command(label="Seleziona Audit.txt", command=process_file)
+    menu_bar.add_cascade(label="File", menu=file_menu)
+    window.config(menu=menu_bar)
 
+    # Aggiungi un nuovo widget Text per contenere string_list
+    global text_box
+    text_box = tk.Text(window, height=33, width=60)
+    text_box.configure(state='normal')
+    text_box.place(x=0, y=20)  # Posiziona la casella di testo
+
+    #Creazione del TreeView
     global tree
-    tree = ttk.Treeview(window)
-    tree.pack(expand=True, fill='both', padx=10, pady=10)
-
-    tree.heading('#0', text='EVADTS TAG')
+    tree = ttk.Treeview(window,height=25)
+    tree.column('#0', width=200)
+    tree.heading('#0', text='EVADTSTAG')
+    tree.place(x=500,y=20)
 
     # Avvio del loop principale
     window.mainloop()
