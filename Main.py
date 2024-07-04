@@ -1,5 +1,5 @@
-from Logic import create_main_window
+from Logic import crea_interfaccia
 
 # Punto di ingresso del programma
 if __name__ == "__main__":
-    create_main_window()
+    crea_interfaccia()
