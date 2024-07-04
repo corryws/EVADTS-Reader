@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog, ttk
+from tkinter import filedialog, ttk, messagebox
 import re
 import os
 
@@ -13,7 +13,7 @@ COLOR_SECONDARY = "#E6202F"  # Rosso brillante
 # Variabili globali
 ID101 = ""
 VA101 = CA201 = DA201 = CA305 = DA401 = DB401 = CA1002 = CA307 = CA403 = CA404 = 0
-time = data = 0
+time = data = ""
 
 # Set per tenere traccia dei tag inseriti nel Treeview
 inserted_tags = set()
@@ -34,6 +34,11 @@ def crea_interfaccia(root):
     file_menu.add_command(label="Apri", command=apri_file)
     file_menu.add_separator()
     file_menu.add_command(label="Esci", command=root.quit)
+
+    # Menu Help
+    help_menu = tk.Menu(menu_bar, tearoff=0, bg=COLOR_PRIMARY, fg="white")
+    menu_bar.add_cascade(label="?", menu=help_menu)
+    help_menu.add_command(label="Informazioni sullo sviluppatore", command=mostra_info_sviluppatore)
 
     # Frame per contenere il Treeview e la scrollbar
     frame = tk.Frame(root, bg=COLOR_PRIMARY)
@@ -154,7 +159,7 @@ def show_info_vending_machine_tag():
         # Azzeramento delle variabili
         ID101 = ""
         VA101 = CA201 = DA201 = CA305 = DA401 = DB401 = CA1002 = CA307 = CA403 = CA404 = 0
-        time  = data = 0
+        time  = data = ""
     
     except ValueError as e:
         log(f"Errore di conversione: {e}")
@@ -163,7 +168,6 @@ def lettura_tag(full_tag, initial_tag, part, i_max, j_max):
     global ID101, VA101, CA201, DA201, CA305, DA401, DB401, CA1002, CA307, CA403, CA404, time, data
     
     if full_tag == "EA302" and "EA302" not in inserted_tags:
-        print(full_tag)
         if len(part) >= 6:
             data = f"{part[4:6]}/{part[2:4]}/{part[0:2]}"
             description = tag_descriptions.get(full_tag, "Nessuna descrizione disponibile")
@@ -182,7 +186,6 @@ def lettura_tag(full_tag, initial_tag, part, i_max, j_max):
             if j_max > 0:
                 for j in range(1, j_max + 1):
                     ca_tag = f"{initial_tag}{i:01}{j:02}"
-                    #if full_tag == ca_tag and part != "0" and part:
                     if full_tag not in inserted_tags:
                         description = tag_descriptions.get(full_tag, "Nessuna descrizione disponibile")
                         tag_tree.insert("", tk.END, values=(full_tag, part, description), tags=('custom_tag',))
@@ -208,13 +211,8 @@ def lettura_tag(full_tag, initial_tag, part, i_max, j_max):
                     elif full_tag == "CA403":
                         CA403 = float(part)
                     elif full_tag == "CA404":
-                            CA404 = float(part)
+                        CA404 = float(part)
             else:
-                """ if initial_tag in ["LA", "AM"]:
-                    ca_tag = f"{initial_tag}{1:01}{i:02}"
-                else:
-                    ca_tag = f"{initial_tag}{i:02}" """
-                #if full_tag == ca_tag and part != "0" and part:
                 if full_tag not in inserted_tags:
                     description = tag_descriptions.get(full_tag, "Nessuna descrizione disponibile")
                     tag_tree.insert("", tk.END, values=(full_tag, part, description), tags=('custom_tag',))
@@ -243,9 +241,17 @@ def apri_file():
         dir_path, file_name = os.path.split(file_path)
         leggi_file(dir_path, file_name)
 
+def mostra_info_sviluppatore():
+    info = """
+    Developer   : Corrado Trigilia
+    WorkPosition: Software Developer at Sisoft s.r.l.
+    Località    : Catania, Sicily, Italy
+    """
+    messagebox.showinfo("Developer Information", info)
+
 # Creazione della finestra principale
 root = tk.Tk()
-root.title("EVADTS Reader")
+root.title("SIEVADTSOFT")
 root.geometry("1200x700")
 root.configure(bg=COLOR_PRIMARY)
 
