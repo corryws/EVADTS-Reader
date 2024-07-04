@@ -16,5 +16,9 @@ It uses Tkinter for the user interface and allows for easy visualization of form
 ## Usage
 1. Use the .bat file within the project to run the current main file of the program.
 
+## Screenshots
+![Screenshot 1](Screen1.png)
+![Screenshot 1](Screen2.png)
+
 ## Contact
 For more information or to request a demo, please contact us at corradotrigilia97@gmail.com | c.trigilia@sisoftsrl.it or visit our website at https://corryws.itch.io
