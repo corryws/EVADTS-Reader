@@ -65,11 +65,16 @@ def crea_interfaccia(root):
     scrollbar = ttk.Scrollbar(frame, orient="vertical", command=tag_tree.yview)
     tag_tree.configure(yscrollcommand=scrollbar.set)
 
-    # Pack Treeview e Scrollbar
-    tag_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    # Creazione di tk.Text per le informazioni dettagliate
+    info_text = tk.Text(frame, width=80, height=70, bg=COLOR_PRIMARY, fg="white", wrap=tk.WORD)
+    info_text.config(state=tk.DISABLED)  # Imposta il widget in stato di sola lettura
 
-    return tag_tree, frame
+    # Pack Treeview, Scrollbar e tk.Text
+    tag_tree.pack(side=tk.LEFT, fill=tk.Y)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    info_text.pack(side=tk.LEFT, padx=10, fill=tk.Y)  # Sposta info_text a sinistra e aggiunge padding
+
+    return tag_tree, frame, info_text
 
 def leggi_file(dir_path, file_name):
     global ID101, VA101, CA201, DA201, CA305, DA401, DB401, CA1002, CA307, CA403, CA404, time, data
@@ -110,6 +115,30 @@ def pulisci_treeview():
     # Resetta il set dei tag inseriti
     inserted_tags.clear()
 
+def convert_to_decimal(value):
+    # Trasforma il valore in intero, se è float
+    if isinstance(value, float):
+        value = int(value)
+    
+    # Converte il valore in una stringa
+    value_str = str(value)
+    #print(f"Valore originale: {value_str}")  # Stampa il valore originale
+
+    # Controlla se il numero è sufficientemente lungo
+    if len(value_str) > 2:
+        # Separa la parte intera dalla parte decimale
+        integer_part = value_str[:-2]
+        decimal_part = value_str[-2:]
+    else:
+        # Se il numero è corto, assume che sia tutto la parte decimale
+        integer_part = '0'
+        decimal_part = value_str.zfill(2)
+    
+    # Unisci le due parti con una virgola
+    result = f"{integer_part},{decimal_part}"
+    #print(f"Valore convertito: {result}")  # Stampa il valore convertito
+    return result
+
 def show_info_vending_machine_tag():
     global ID101, VA101, CA201, DA201, CA305, DA401, DB401, CA1002, CA307, CA403, CA404, time, data
     
@@ -130,31 +159,35 @@ def show_info_vending_machine_tag():
         data = data
         
         cumulative_values = [
-            ("VALORI CUMULATI DELLA MACCHINA-----------------------------------------------------------------------------","-------------------------------------------------------------"),
+            ("VALORI CUMULATI DELLA MACCHINA",""),
             ("DATI DELLA MACCHINA", ID101),
-            ("VENDUTO", f"{VA101:.2f}€"),  # Esempio di formattazione per due decimali
-            ("VALORE ACCREDITATO SU CASHLESS 1", f"{DA401:.2f}€"),
-            ("VALORE ACCREDITATO SU CASHLESS 2", f"{DB401:.2f}€"),
-            ("DATA   LETTURA QUESTO AUDIT", data),
+            ("VENDUTO", f"{convert_to_decimal(VA101)}€"),
+            ("VALORE ACCREDITATO SU CASHLESS 1", f"{convert_to_decimal(DA401)}€"),
+            ("VALORE ACCREDITATO SU CASHLESS 2", f"{convert_to_decimal(DB401)}€"),
+            ("DATA LETTURA QUESTO AUDIT", data),
             ("ORARIO LETTURA QUESTO AUDIT", time),
-            ("CALCOLO----------------------------------------------------------------------------------------","-------------------------------------------------------------"),
-            ("VENDUTO CONTANTE", f"{CA201:.2f}€"),
-            ("VENDUTO NO CONTANTE", f"{DA201:.2f}€"),
-            ("INCASSO", f"{CA305:.2f}€"),
-            ("INCASSO PER RICARICA", f"{(DA401 + DB401):.2f}€"),  # Esempio di formattazione per due decimali
-            ("INCASSO PER VENDITA", f"{(CA305 - (DA401 + DB401)) - CA1002:.2f}€"),
-            ("TOTALE RESO TUBI RESTO", f"{CA403:.2f}€"),
-            ("VALORE TOTALE MONETE AGGIUNTE", f"{CA307:.2f}€"),
-            ("TOTALE RESO MANUALE TUBI RESTO", f"{CA404:.2f}€"),
-            ("VALORE TOTALE MONETE AGGIUNTE MANUALMENTE", f"{CA1002:.2f}€"),
-            ("-----------------------------------------------------------------------------------------------------------","-------------------------------------------------------------"),
+            ("___________________________________________________________________",""),
+            ("VENDUTO CONTANTE CUMULATO", f"{convert_to_decimal(CA201)}€"),
+            ("VENDUTO NO CONTANTE CUMULATO", f"{convert_to_decimal(DA201)}€"),
+            ("INCASSO CUMULATO", f"{convert_to_decimal(CA305)}€"),
+            ("INCASSO PER RICARICA CUMULATO", f"{convert_to_decimal(DA401 + DB401)}€"),
+            ("INCASSO PER VENDITA CUMULATO", f"{convert_to_decimal(CA305 - (DA401 + DB401) - CA1002)}€"),
+            ("TOTALE RESO TUBI RESTO CUMULATO", f"{convert_to_decimal(CA403)}€"),
+            ("VALORE TOTALE MONETE AGGIUNTE CUMULATO", f"{convert_to_decimal(CA307)}€"),
+            ("TOTALE RESO MANUALE TUBI RESTO CUMULATO", f"{convert_to_decimal(CA404)}€"),
+            ("VALORE TOTALE MONETE AGGIUNTE MANUALMENTE CUMULATO", f"{convert_to_decimal(CA1002)}€"),
+            ("___________________________________________________________________",""),
         ]
 
+        # Pulizia del widget tk.Text
+        info_text.config(state=tk.NORMAL)
+        info_text.delete("1.0", tk.END)
+
         for tag, value in cumulative_values:
-            if tag not in inserted_tags:
-                description = tag_descriptions.get(tag, "")
-                tag_tree.insert("", tk.END, values=(tag, value, description), tags=('custom_tag',))
-                inserted_tags.add(tag)
+            info_text.insert(tk.END, f"{tag}\n{value}\n")
+        
+        # Disabilita il widget per la sola lettura
+        info_text.config(state=tk.DISABLED)
         
         # Azzeramento delle variabili
         ID101 = ""
@@ -253,10 +286,11 @@ def mostra_info_sviluppatore():
 root = tk.Tk()
 root.title("SIEVADTSOFT")
 root.geometry("1200x700")
+root.resizable(False, False)
 root.configure(bg=COLOR_PRIMARY)
 
 # Creazione dell'interfaccia grafica
-tag_tree, frame = crea_interfaccia(root)
+tag_tree, frame, info_text = crea_interfaccia(root)
 
 # Avvio della finestra
 root.mainloop()
