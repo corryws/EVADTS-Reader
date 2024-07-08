@@ -1,4 +1,4 @@
-# EVA-DTS READER
+# SIEVADTSOFT (EVA-DTS READER)
 
 SIEVADTSOFT is a EVA-DTS READER GUI application for reading and formatting text files containing EVA-DTS data.
 It uses Tkinter for the user interface and allows for easy visualization of formatted strings in a Treeview.
