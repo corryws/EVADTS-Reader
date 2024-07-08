@@ -1,0 +1,72 @@
+Inizio
+|
+|-- Sezione CPI
+|   |-- Se il campo "CA102000" non è vuoto:
+|   |   |-- controllo valore di "CA102000":
+|   |       |-- se "CF8000EXEC", "CF8000MDB", "CF690", "CF6000EXEC", "EC6000MDB", "CF7900EXEC", "CF7900MDB":
+|   |           |-- MarcaModello = "MEI|campo"
+|   |
+|
+|-- Sezione COGES
+|   |-- Se MarcaModello è vuoto:
+|   |   |-- Se il campo "ID102000" non è vuoto:
+|   |   |   |-- controllo valore di "ID102000":
+|   |   |       |-- se "93", "97", "77", "64", "76", "38", "30", "AETERNA  85", "85":
+|   |   |           |-- Assegna MarcaModello = "COGES|campo"
+|   |   |
+|   |   |-- Altrimenti, se il valore di "ID101000" inizia con "COG":
+|   |       |-- Se non esiste la campo "CA403000":
+|   |           |-- Assegna MarcaModello = "COGES|IDEA4COL"
+|   |   
+|
+|-- Sezione PAYTEC
+|   |-- Se sMarcaModello è vuoto:
+|   |   |-- Se il campo "ID102000" esiste:
+|   |   |   |-- Se il valore di dcAudit("ID102000") inizia con "FAG":
+|   |   |       |-- Loop su "MA502000" per cercare la chiave "AUDIT FILE REVISION":
+|   |   |           |-- Select Case sull'ultimo carattere di dcAudit("MA502" + sIndice):
+|   |   |               |-- Caso "1", "2", "3", "4":
+|   |   |                   |-- Assegna sMarcaModello = "PAYTEC|PAYTECVx"
+|   |   |   
+|   |   |-- Altrimenti, assegna sMarcaModello = "PAYTEC|PAYTECV0"
+|   |   
+|
+|-- Sezione SUZOHAPP
+|   |-- Se sMarcaModello è vuoto:
+|   |   |-- Se il campo "CA102000" esiste e il valore inizia con "C2":
+|   |       |-- Assegna sMarcaModello = "SUZ0HAPP|CURRENZA"
+|   |   
+|   |-- Se il campo "ID102000" esiste:
+|   |   |-- Se il valore di dcAudit("ID102000") inizia con "WKL":
+|   |   |   |-- Assegna sMarcaModello = "SUZ0HAPP|WORLDKEY"
+|   |   |
+|   |   |-- Se il valore di dcAudit("ID102000") inizia con "EKN":
+|   |       |-- Assegna sMarcaModello = "SUZ0HAPP|EURO KEY NEXT"
+|   |
+|   |-- Altrimenti, se la chiave "ID705000" esiste:
+|       |-- Se il valore di dcAudit("ID705000") inizia con "WKL":
+|       |   |-- Assegna sMarcaModello = "SUZ0HAPP|WORLDKEY"
+|       |
+|       |-- Se il valore di dcAudit("ID705000") inizia con "EKN":
+|           |-- Assegna sMarcaModello = "SUZ0HAPP|EURO KEY NEXT"
+|
+|-- Sezione ELKEY
+|   |-- Se sMarcaModello è vuoto:
+|   |   |-- Se il campo "DA102000" esiste e il valore inizia con "1":
+|   |       |-- Assegna sMarcaModello = "ELKEY|BUBBLE"
+|   |
+|   |-- Se il campo "ID102000" esiste e il valore è "ELK Bubble":
+|       |-- Assegna sMarcaModello = "ELKEY|BUBBLE"
+|
+|-- Sezione Dispositivo Generico
+|   |-- Se sMarcaModello non è vuoto:
+|   |   |-- Assegna Risposta = sMarcaModello
+|   |
+|   |-- Altrimenti, se il valore di "ID101000" non inizia con un numero:
+|   |   |-- Assegna Risposta = Utilita.Left(dcAudit("ID101000"), 3) & "|XXX"
+|   |
+|   |-- Altrimenti, assegna Risposta = "XXX|XXX"
+|
+|-- Log della Marca e del Modello
+|
+|-- Ritorna Risposta

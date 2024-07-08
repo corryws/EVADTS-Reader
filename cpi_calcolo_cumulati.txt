@@ -1,33 +1,46 @@
+SEGNI CON CUI indicherò le formule uguali tra le gettoniere ✅ | ☑️
+
+CAMPI TAG DI DATI UGUALI PER TUTTI I MODELLI GETTONIERE
+EA302                          = DATA DI QUESTA LETTURA ✅
+EA303                          = ORA DI QUESTA LETTURA  ✅
+EA305 & EA306                  = DataOraPrelievoPrec    ✅
+EA301                          = ProgressivoPrelievo    ✅
+TotaleResoTubiResto            = CA403                  ✅
+TotaleCaricatoTubiResto        = CA307                  ✅
+TotaleResoManualeTubiResto     = CA404                  ✅
+TotaleCaricatoManualeTubiResto = CA1002                 ✅
+
+
+NOTA BENE: VA101 indica i valori CUMULATI della MACCHINA
+
 valori CUMULATO della gettoniera ->  MEI | CPI
 Venduto                        = VA101-DA503-DB503-CA702+CA706+DA507+DB507
-VendutoContante                = CA201-CA702+CA706
-VendutoNoContante              = DA201+DB201-DA503-DB503+TA201+TA205+DA507+DB507
-Incassato                      = CA305
+VendutoContante                = CA201-CA702+CA706 ✅
+VendutoNoContante              = DA201+DB201-DA503-DB503+TA201+TA205+DA507+DB507✅
+Incassato                      = CA305 ☑️
 IncassatoRicarica              = DA201(DA301|>|0|) + DB201(DB301|>|0|) + DA401 + DB401 - DA301 - DB301 - DB505 - DA505
-IncassatoVendita               = CA305 - CA1002 - DA401 - DB401
-TotaleResoTubiResto            = CA403
-TotaleCaricatoTubiResto        = CA307
-TotaleResoManualeTubiResto     = CA404
-TotaleCaricatoManualeTubiResto = CA1002
+IncassatoVendita               = CA305 - CA1002 - DA401 - DB401 ✅
+
+valori CUMULATO della gettoniera MHD | MICROHARD
+Venduto                        = VA101
+VendutoContante                = CA201 - CA702 + CA706 ✅
+VendutoNoContante              = DA201 + DB201 - DA503 - DB503 + TA201 + TA205 + DA507 + DB507✅
+Incassato                      = CA305 + DA301 + DB301
+IncassatoRicarica              = DA401 + DB401
+IncassatoVendita               = CA305 - CA1002 - DA401 - DB401 ✅
+
+valori CUMULATO della gettoniera COG | COGES V0
+Venduto                        = VA101 + VA301
+VendutoContante                = CA201
+VendutoNoContante              = VA101 + CA201
+Incassato                      = CA305 ☑️
+IncassatoRicarica              = DA401 + DA601 - DB401 - DB601
+IncassatoVendita               = CA305 - CA1002 - DA401 + DA601 - DB401 + DB601
 
 
 SPIEGAZIONE LOGICA
-Permette di inserire una condizione per validare o meno il campo: 
 es. EA204(EA201|=|VALORE|)
 seleziona EA204 solo se EA201 è = al valore desiderato
 
 es. DA201(DA301|>|0|)
 seleziona DA201 solo se DA301 è > a 0
-
-IMPUT: (es. EA204(EA201|=|VALORE|))
-Campo da prelevare EA204
-Simbolo per attivare il controllo della condizione (
-Campo da controllare EA201
-Separatatore |
-Condizione logica = (ammessi =, <,>,<>)
-Valore atteso
-
-'OUT:
-'True, valorizza il sNomeCampo(è un ref)con il nome del campo da prelevare (da es. EA204002)
-'False, valorizza il sNomeCampo(è un ref)con False così da non essere trovato nel file audit
-'Se le condizioni sono 2 è possibile inserire "and" oppure "or" per legare le 2 condizioni (ES. MA504(MA501|=|2|and|MA502|=|1|))

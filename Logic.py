@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import filedialog, ttk, messagebox
 import re
 import os
-from function import convert_to_decimal,valida_scelta_campo
+from function import convert_to_decimal,valida_scelta_campo,mostra_info_sviluppatore,convertTagToData,convertTagToTime
 
 # Importa il dizionario tag_descriptions dal modulo tag.py
 from tag import tag_descriptions
@@ -12,26 +12,20 @@ COLOR_PRIMARY   = "#0F1626"  # Blu
 COLOR_SECONDARY = "#E6202F"  # Rosso 
 
 # Variabili globali
-ID101 = CA101 = ""
-VA101 = CA201 = DA201 = CA305 = DA401 = DB401 = CA1002 = CA307 = CA403 = CA404 = 0
+ID101 = CA101 = EA302 = EA303 = EA305 = EA306 = EA301 = ID102 = ID705 = DA102 = ""
+VA101 = CA201 = DA201 = CA305 = DA401 = DB401 = CA1002 = CA307 = CA403 = CA404 = CA102 = 0
 DA503 = DB503 = CA702 = CA706 = DA507 = DB507 = DB201 = TA201 = TA205 = DA301 = DB301 = DB505 = DA505 = 0
-time = data = ""
 
 # Set per tenere traccia dei tag inseriti nel Treeview
 inserted_tags = set()
 
 #funzione per azzerare le variabili globali
 def azzera():
-    global ID101, CA101, VA101, CA201, DA201, CA305, DA401, DB401, CA1002, CA307, CA403, CA404, time, data
-    global DA503,DB503,CA702,CA706,DA507,DB507,DB201, TA201, TA205 , DA301 , DB301, DB505, DA505
-    ID101 = CA101 = ""
+    global ID101,ID102, CA101, CA102, VA101, CA201, DA201, CA305, DA401, DB401, CA1002, CA307, CA403, CA404, ID705, DA102
+    global DA503,DB503,CA702,CA706,DA507,DB507,DB201, TA201, TA205 , DA301 , DB301, DB505, DA505,EA302,EA303,EA305,EA306,EA301
+    ID101 = CA101 = EA302 = EA303 = EA305 = EA306 = EA301 = ID102 = ID705 = DA102 = ""
     VA101 = CA201 = DA201 = CA305 = DA401 = DB401 = CA1002 = CA307 = CA403 = CA404 = 0
     DA503 = DB503 = CA702 = CA706 = DA507 = DB507 = DB201 = TA201 = TA205 = DA301 = DB301 = DB505 = DA505 = 0
-    time = data = ""
-
-# Funzione per la registrazione dei messaggi
-def log(message):
-    print(message)
 
 # Funzione per creare e restituire gli elementi dell'interfaccia grafica
 def crea_interfaccia(root):
@@ -115,9 +109,9 @@ def leggi_file(dir_path, file_name):
 
             show_info_vending_machine_tag()
         else:
-            log(f"Il file specificato non esiste: {os.path.join(dir_path, file_name)}")
+            print(f"Il file specificato non esiste: {os.path.join(dir_path, file_name)}")
     except Exception as e:
-        log(f"Errore durante la lettura del file: {e}")
+        print(f"Errore durante la lettura del file: {e}")
 
 def pulisci_treeview():
     global tag_tree, inserted_tags
@@ -125,9 +119,61 @@ def pulisci_treeview():
         tag_tree.delete(item)
     inserted_tags.clear()
 
+def RicavaMarcaModelloGettoniera():
+    global ID101,ID102, CA101, CA102, VA101, CA201, DA201, CA305, DA401, DB401, CA1002, CA307, CA403, CA404 ,ID705, DA102
+    global DA503,DB503,CA702,CA706,DA507,DB507,DB201, TA201, TA205 , DA301 , DB301, DB505, DA505,EA302,EA303,EA305,EA306,EA301
+
+    MarcaModello = ""
+
+    # RICAVO MODELLO CPI
+    if CA102 != "":
+        if CA102 in ["CF8000EXEC", "CF8000MDB", "CF690", "CF6000EXEC", "EC6000MDB", "CF7900EXEC", "CF7900MDB"]:
+            MarcaModello = "MEI|" + CA102
+
+    # RICAVO MODELLO COGES
+    if MarcaModello == "":
+        if ID102 != "":
+            if ID102 in ["93", "97", "77", "64", "76", "38", "30", "AETERNA", "85"]:
+                MarcaModello = "COGES|" + ID102
+        elif CA101.startswith("COG"):
+            if CA403 == "":
+                MarcaModello = "COGES|IDEA4COL"
+
+    # RICAVO MODELLO PAYTEC
+    if MarcaModello == "":
+        if ID102 != "":
+            if ID102.startswith("FAG"):
+                MarcaModello = "PAYTEC|PAYTECV0"
+
+    # RICAVO MODELLO SUZOHAPP
+    if MarcaModello == "":
+        if CA102 != "" and CA102.startswith("C2"):
+            MarcaModello = "SUZ0HAPP|CURRENZA"
+    
+    if ID102 != "":
+        if  ID102.startswith("WKL"):
+            MarcaModello = "SUZ0HAPP|WORLDKEY"
+        elif ID102.startswith("EKN"):
+            MarcaModello = "SUZ0HAPP|EURO KEY NEXT"
+
+    if ID705 != "":
+        if  ID705.startswith("WKL"):
+            MarcaModello = "SUZ0HAPP|WORLDKEY"
+        elif ID705.startswith("EKN"):
+            MarcaModello = "SUZ0HAPP|EURO KEY NEXT"
+
+    # RICAVO MODELLO ELKEY
+    if MarcaModello == "":
+        if DA102 != "" and DA102.startswith("1"):
+            MarcaModello = "ELKEY|BUBBLE"
+        if DA102 != "" and DA102 == "ELK Bubble":
+            MarcaModello = "ELKEY|BUBBLE"
+
+    return MarcaModello
+
 def show_info_vending_machine_tag():
-    global ID101, CA101, VA101, CA201, DA201, CA305, DA401, DB401, CA1002, CA307, CA403, CA404, time, data
-    global DA503,DB503,CA702,CA706,DA507,DB507,DB201, TA201, TA205 , DA301 , DB301, DB505, DA505
+    global ID101,ID102, CA101, CA102, VA101, CA201, DA201, CA305, DA401, DB401, CA1002, CA307, CA403, CA404 , ID705, DA102
+    global DA503,DB503,CA702,CA706,DA507,DB507,DB201, TA201, TA205 , DA301 , DB301, DB505, DA505,EA302,EA303,EA305,EA306,EA301
     
     try:
         VA101  = float(VA101)
@@ -153,12 +199,16 @@ def show_info_vending_machine_tag():
         DA301  = float(DB301)
         DB505  = float(DB505)
         DA505  = float(DA505)
+        CA102  = CA102
+        EA301 = EA301
+        EA302 = EA302
+        EA303 = EA303
+        EA305 = EA305
+        EA306 = EA306
+        ID102 = ID102
+        ID705 = ID705
+        DA102 = DA102
 
-        
-        # EA302 e EA303 potrebbero già essere stringhe formattate correttamente, non necessitano di conversione
-        time = time
-        data = data
-        
         if CA101 == "":
             id_gettoniera = ID101
         else:
@@ -166,9 +216,12 @@ def show_info_vending_machine_tag():
 
         cumulative_values = [
             ("DATI VENDING MACHINE",""),
-            ("ID101: DATI DELLA MACCHINA", id_gettoniera),
-            ("EA302: DATA DI QUESTA LETTURA", data),
-            ("EA303: ORA DI QUESTA LETTURA", time),
+            ("DATI DELLA GETTONIERA", id_gettoniera),
+            ("MODELLO GETTONIERA", RicavaMarcaModelloGettoniera()),
+            ("ProgressivoPrelievo", EA301),
+            ("DATA DI QUESTA LETTURA", EA302),
+            ("ORA DI QUESTA LETTURA", EA303),
+            ("DataOraPrelievoPrecedente: ", EA305 + " " +EA306),
             ("___________________________________________________________________",""),
             ("VALORI CUMULATI DELLA MACCHINA - NUOVA FORMULA",""),
             ("Venduto", f"{convert_to_decimal(VA101)}€"),
@@ -177,10 +230,6 @@ def show_info_vending_machine_tag():
             ("Incassato", f"{convert_to_decimal(CA305)}€"),
             ("IncassatoRicarica", f"{convert_to_decimal(DA401 + DB401)}€"),
             ("IncassatoVendita", f"{convert_to_decimal(CA305 - (DA401 + DB401) - CA1002)}€"),
-            ("TotaleResoTubiResto", f"{convert_to_decimal(CA403)}€"),
-            ("TotaleCaricatoTubiResto", f"{convert_to_decimal(CA307)}€"),
-            ("TotaleResoManualeTubiResto", f"{convert_to_decimal(CA404)}€"),
-            ("TotaleCaricatoManualeTubiResto", f"{convert_to_decimal(CA1002)}€"),
             ("___________________________________________________________________",""),
             ("VALORI CUMULATI DELLA MACCHINA - FORMULA MEI | CPI",""),
             ("Venduto", f"{convert_to_decimal( (VA101-DA503-DB503-CA702) + (CA706+DA507+DB507) )}€"),
@@ -189,6 +238,16 @@ def show_info_vending_machine_tag():
             ("Incassato   ", f"{convert_to_decimal(CA305)}€"),
             ("IncassatoRicarica", f"{convert_to_decimal(valida_scelta_campo(DA201,DA301,'>',0) + valida_scelta_campo(DB201,DB301,'>',0) + DA401 + DB401 - (DA301 - DB301 - DB505 - DA505))}€"),
             ("IncassatoVendita   ", f"{convert_to_decimal(CA305 - CA1002 - DA401 - DB401)}€"),
+            ("___________________________________________________________________",""),
+            ("VALORI CUMULATI DELLA MACCHINA - FORMULA MHD | MICROHARD",""),
+            ("Venduto", f"{convert_to_decimal(VA101)}€"),
+            ("VendutoContante", f"{convert_to_decimal( (CA201-CA702) + CA706 )}€"),
+            ("VendutoNoContante", f"{convert_to_decimal( (DA201+DB201) - (DA503+TA201+TA205+DA507+DB507) )}€"),
+            ("Incassato   ", f"{convert_to_decimal(CA305 + DA301 + DB301)}€"),
+            ("IncassatoRicarica   ", f"{convert_to_decimal(DA401 + DB401)}€"),
+            ("IncassatoVendita   ", f"{convert_to_decimal(CA305 - CA1002 - DA401 - DB401)}€"),
+            ("___________________________________________________________________",""),
+            ("VALORI CUMULATI DELLA MACCHINA IDENTICI PER TUTTE LE ECCEZIONI",""),
             ("TotaleResoTubiResto", f"{convert_to_decimal(CA403)}€"),
             ("TotaleCaricatoTubiResto", f"{convert_to_decimal(CA307)}€"),
             ("TotaleResoManualeTubiResto", f"{convert_to_decimal(CA404)}€"),
@@ -209,42 +268,47 @@ def show_info_vending_machine_tag():
         azzera()
     
     except ValueError as e:
-        log(f"Errore di conversione: {e}")
+        print(f"Errore di conversione: {e}")
 
 def lettura_tag(full_tag, initial_tag, part, i_max, j_max):
-    global ID101, CA101, VA101, CA201, DA201, CA305, DA401, DB401, CA1002, CA307, CA403, CA404, time, data
-    global DA503,DB503,CA702,CA706,DA507,DB507,DB201, TA201, TA205 , DA301 , DB301, DB505, DA505
-    
-    if full_tag == "EA302" and "EA302" not in inserted_tags:
-        if len(part) >= 6:
-            data = f"{part[4:6]}/{part[2:4]}/{part[0:2]}"
-            description = tag_descriptions.get(full_tag, "Nessuna descrizione disponibile")
-            tag_tree.insert("", tk.END, values=("EA302", data, description), tags=('custom_tag',))
-            inserted_tags.add("EA302")
-            
-    if full_tag == "EA303" and "EA303" not in inserted_tags:
-        if len(part) >= 4:
-            time = f"{part[0:2]}:{part[2:4]}"
-            description = tag_descriptions.get(full_tag, "Nessuna descrizione disponibile")
-            tag_tree.insert("", tk.END, values=("EA303", time, description), tags=('custom_tag',))
-            inserted_tags.add("EA303")
+    global ID101, ID102, CA101, CA102, VA101, CA201, DA201, CA305, DA401, DB401, CA1002, CA307, CA403, CA404, ID705, DA102
+    global DA503,DB503,CA702,CA706,DA507,DB507,DB201, TA201, TA205 , DA301 , DB301, DB505, DA505,EA302,EA303,EA305,EA306,EA301
 
-    if full_tag.startswith(initial_tag):
-        for i in range(1, i_max + 1):
-            if j_max > 0:
-                for j in range(1, j_max + 1):
-                    if full_tag not in inserted_tags:
-                        description = tag_descriptions.get(full_tag, "Nessuna descrizione disponibile")
-                        tag_tree.insert("", tk.END, values=(full_tag, part, description), tags=('custom_tag',))
-                        inserted_tags.add(full_tag)
+    for i in range(1, i_max + 1):
+        if j_max > 0:
+            for j in range(1, j_max + 1):
+                if full_tag not in inserted_tags:
+                    description = tag_descriptions.get(full_tag, "Nessuna descrizione disponibile")
+                    tag_tree.insert("", tk.END, values=(full_tag, part, description), tags=('custom_tag',))
+                    inserted_tags.add(full_tag)
                     if full_tag == "ID101":
                         ID101 = part
+                    if full_tag == "ID102":
+                        ID102 = part
+                    if full_tag == "ID705":
+                        ID705 = part
                     elif full_tag == "VA101":
                         VA101 = float(part)
-                    elif full_tag == "CA201":
-                        CA201 = float(part)
+                    if full_tag == "ID101":
+                        ID101 = part
+                    elif full_tag == "EA301":
+                        EA301 = part
+                    elif full_tag == "EA302":
+                        if len(part) >= 6:
+                            EA302 = convertTagToData(part)
+                    elif full_tag == "EA303":
+                        if len(part) >= 4:
+                            EA303 = convertTagToTime(part)
+                    elif full_tag == "EA305":
+                        if len(part) >= 6:
+                            EA305 = convertTagToData(part)
+                    elif full_tag == "EA306":
+                        if len(part) >= 4:
+                            EA306 = convertTagToTime(part)
                     elif full_tag == "CA101":
                         CA101 = part
+                    elif full_tag == "CA102":
+                        CA102 = part
                     elif full_tag == "DA503":
                         DA503 = float(part)
                     elif full_tag == "DB503":
@@ -263,6 +327,8 @@ def lettura_tag(full_tag, initial_tag, part, i_max, j_max):
                         DB201 = float(part)
                     elif full_tag == "CA305":
                         CA305 = float(part)
+                    elif full_tag == "DA102":
+                        DA102 = float(part)
                     elif full_tag == "DA401":
                         DA401 = float(part)
                     elif full_tag == "DB401":
@@ -287,15 +353,15 @@ def lettura_tag(full_tag, initial_tag, part, i_max, j_max):
                         DB505 = float(part)
                     elif full_tag == "DA505":
                         DA505 = float(part)
-            else:
-                if full_tag not in inserted_tags:
-                    description = tag_descriptions.get(full_tag, "Nessuna descrizione disponibile")
-                    tag_tree.insert("", tk.END, values=(full_tag, part, description), tags=('custom_tag',))
-                    inserted_tags.add(full_tag)
+                else:
+                    if full_tag not in inserted_tags:
+                        description = tag_descriptions.get(full_tag, "Nessuna descrizione disponibile")
+                        tag_tree.insert("", tk.END, values=(full_tag, part, description), tags=('custom_tag',))
+                        inserted_tags.add(full_tag)
 
 def selettore_tag(tag, formatted_index, part):
     full_tag = tag + formatted_index
-    lettura_tag(full_tag, "ID", part, 9, 11) , lettura_tag(full_tag, "ID1", part, 8, 10)
+    lettura_tag(full_tag, "ID", part, 9, 11) , lettura_tag(full_tag, "ID1", part, 8, 10) ,lettura_tag(full_tag, "EA", part, 9, 10)
     lettura_tag(full_tag, "CA", part, 10, 8) , lettura_tag(full_tag, "MA", part, 9, 11)
     lettura_tag(full_tag, "PA", part, 8, 10) , lettura_tag(full_tag, "TA", part, 10, 8)
     lettura_tag(full_tag, "VA", part, 3, 9)  , lettura_tag(full_tag, "DXS", part, 6, 0)
@@ -309,14 +375,6 @@ def apri_file():
     if file_path:
         dir_path, file_name = os.path.split(file_path)
         leggi_file(dir_path, file_name)
-
-def mostra_info_sviluppatore():
-    info = """
-    Developer   : Corrado Trigilia
-    WorkPosition: Software Developer at Sisoft s.r.l.
-    Località    : Catania, Sicily, Italy
-    """
-    messagebox.showinfo("Developer Information", info)
 
 # Creazione della finestra principale
 root = tk.Tk()
