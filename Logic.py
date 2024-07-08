@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog, ttk, messagebox
 import re
 import os
+from variable_tag import GlobalState
 from function import convert_to_decimal,valida_scelta_campo,mostra_info_sviluppatore,convertTagToData,convertTagToTime
 
 # Importa il dizionario tag_descriptions dal modulo tag.py
@@ -11,25 +12,11 @@ from tag import tag_descriptions
 COLOR_PRIMARY   = "#0F1626"  # Blu 
 COLOR_SECONDARY = "#E6202F"  # Rosso 
 
-# Variabili globali
-ID101 = CA101 = EA302 = EA303 = EA305 = EA306 = EA301 = ID102 = ID705 = DA102 = ""
-VA101 = CA201 = DA201 = CA305 = DA401 = DB401 = CA1002 = CA307 = CA403 = CA404 = CA102 = 0
-DA503 = DB503 = CA702 = CA706 = DA507 = DB507 = DB201 = TA201 = TA205 = DA301 = DB301 = DB505 = DA505 = 0
-
 # Set per tenere traccia dei tag inseriti nel Treeview
 inserted_tags = set()
 
-#funzione per azzerare le variabili globali
-def azzera():
-    global ID101,ID102, CA101, CA102, VA101, CA201, DA201, CA305, DA401, DB401, CA1002, CA307, CA403, CA404, ID705, DA102
-    global DA503,DB503,CA702,CA706,DA507,DB507,DB201, TA201, TA205 , DA301 , DB301, DB505, DA505,EA302,EA303,EA305,EA306,EA301
-    ID101 = CA101 = EA302 = EA303 = EA305 = EA306 = EA301 = ID102 = ID705 = DA102 = ""
-    VA101 = CA201 = DA201 = CA305 = DA401 = DB401 = CA1002 = CA307 = CA403 = CA404 = 0
-    DA503 = DB503 = CA702 = CA706 = DA507 = DB507 = DB201 = TA201 = TA205 = DA301 = DB301 = DB505 = DA505 = 0
-
 # Funzione per creare e restituire gli elementi dell'interfaccia grafica
-def crea_interfaccia(root):
-
+def crea_interfaccia(root, state):
     # Creazione della barra dei menu
     menu_bar = tk.Menu(root, bg=COLOR_PRIMARY, fg="white")
     root.config(menu=menu_bar)
@@ -37,7 +24,7 @@ def crea_interfaccia(root):
     # Menu File
     file_menu = tk.Menu(menu_bar, tearoff=0, bg=COLOR_PRIMARY, fg="white")
     menu_bar.add_cascade(label="File", menu=file_menu)
-    file_menu.add_command(label="Apri", command=apri_file)
+    file_menu.add_command(label="Apri", command=lambda: apri_file(state))
     file_menu.add_separator()
     file_menu.add_command(label="Esci", command=root.quit)
 
@@ -68,22 +55,27 @@ def crea_interfaccia(root):
     tag_tree.heading("Description", text="Description")  # Intestazione per la nuova colonna
 
     # Scrollbar verticale per il Treeview
-    scrollbar = ttk.Scrollbar(frame, orient="vertical", command=tag_tree.yview)
-    tag_tree.configure(yscrollcommand=scrollbar.set)
+    scrollbar_tree = ttk.Scrollbar(frame, orient="vertical", command=tag_tree.yview)
+    tag_tree.configure(yscrollcommand=scrollbar_tree.set)
 
     # Creazione di tk.Text per le informazioni dettagliate
     info_text = tk.Text(frame, width=80, height=70, bg=COLOR_PRIMARY, fg="white", wrap=tk.WORD)
     info_text.config(state=tk.DISABLED)  # Imposta il widget in stato di sola lettura
 
+    # Scrollbar verticale per il tk.Text
+    scrollbar_text = ttk.Scrollbar(frame, orient="vertical", command=info_text.yview)
+    info_text.configure(yscrollcommand=scrollbar_text.set)
+
     # Pack Treeview, Scrollbar e tk.Text
-    tag_tree.pack(side=tk.LEFT, fill=tk.Y)
-    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-    info_text.pack(side=tk.LEFT, padx=10, fill=tk.Y)  # Sposta info_text a sinistra e aggiunge padding
+    tag_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    scrollbar_tree.pack(side=tk.LEFT, fill=tk.Y)
+    info_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(10, 0))
+    scrollbar_text.pack(side=tk.LEFT, fill=tk.Y)
 
     return tag_tree, frame, info_text
 
 #funzione che legge il file audit selezionato
-def leggi_file(dir_path, file_name):
+def leggi_file(dir_path, file_name,state):
     try:
         if os.path.exists(os.path.join(dir_path, file_name)):
 
@@ -103,11 +95,11 @@ def leggi_file(dir_path, file_name):
                     
                     for i in range(1, len(parts)):
                         formatted_index = f"{i:02}"
-                        selettore_tag(tag, formatted_index, parts[i])
+                        selettore_tag(tag, formatted_index, parts[i],state)
                     
                     line_number += 1
 
-            show_info_vending_machine_tag()
+            show_info_vending_machine_tag(state)
         else:
             print(f"Il file specificato non esiste: {os.path.join(dir_path, file_name)}")
     except Exception as e:
@@ -119,140 +111,155 @@ def pulisci_treeview():
         tag_tree.delete(item)
     inserted_tags.clear()
 
-def RicavaMarcaModelloGettoniera():
-    global ID101,ID102, CA101, CA102, VA101, CA201, DA201, CA305, DA401, DB401, CA1002, CA307, CA403, CA404 ,ID705, DA102
-    global DA503,DB503,CA702,CA706,DA507,DB507,DB201, TA201, TA205 , DA301 , DB301, DB505, DA505,EA302,EA303,EA305,EA306,EA301
+def RicavaMarcaModelloGettoniera(state):
 
     MarcaModello = ""
 
     # RICAVO MODELLO CPI
-    if CA102 != "":
-        if CA102 in ["CF8000EXEC", "CF8000MDB", "CF690", "CF6000EXEC", "EC6000MDB", "CF7900EXEC", "CF7900MDB"]:
-            MarcaModello = "MEI|" + CA102
+    if state.CA102 != "":
+        if state.CA102 in ["CF8000EXEC", "CF8000MDB", "CF690", "CF6000EXEC", "EC6000MDB", "CF7900EXEC", "CF7900MDB"]:
+            MarcaModello = "MEI|" + state.CA102
 
     # RICAVO MODELLO COGES
     if MarcaModello == "":
-        if ID102 != "":
-            if ID102 in ["93", "97", "77", "64", "76", "38", "30", "AETERNA", "85"]:
-                MarcaModello = "COGES|" + ID102
-        elif CA101.startswith("COG"):
-            if CA403 == "":
+        if state.ID102 != "":
+            if state.ID102 in ["93", "97", "77", "64", "76", "38", "30", "AETERNA", "85"]:
+                MarcaModello = "COGES|" + state.ID102
+        elif state.CA101.startswith("COG"):
+            if state.CA403 == "":
                 MarcaModello = "COGES|IDEA4COL"
 
     # RICAVO MODELLO PAYTEC
     if MarcaModello == "":
-        if ID102 != "":
-            if ID102.startswith("FAG"):
+        if state.ID102 != "":
+            if state.ID102.startswith("FAG"):
                 MarcaModello = "PAYTEC|PAYTECV0"
 
     # RICAVO MODELLO SUZOHAPP
     if MarcaModello == "":
-        if CA102 != "" and CA102.startswith("C2"):
+        if state.CA102 != "" and state.CA102.startswith("C2"):
             MarcaModello = "SUZ0HAPP|CURRENZA"
     
-    if ID102 != "":
-        if  ID102.startswith("WKL"):
+    if state.ID102 != "":
+        if  state.ID102.startswith("WKL"):
             MarcaModello = "SUZ0HAPP|WORLDKEY"
-        elif ID102.startswith("EKN"):
+        elif state.ID102.startswith("EKN"):
             MarcaModello = "SUZ0HAPP|EURO KEY NEXT"
 
-    if ID705 != "":
-        if  ID705.startswith("WKL"):
+    if state.ID705 != "":
+        if  state.ID705.startswith("WKL"):
             MarcaModello = "SUZ0HAPP|WORLDKEY"
-        elif ID705.startswith("EKN"):
+        elif state.ID705.startswith("EKN"):
             MarcaModello = "SUZ0HAPP|EURO KEY NEXT"
 
     # RICAVO MODELLO ELKEY
     if MarcaModello == "":
-        if DA102 != "" and DA102.startswith("1"):
+        if state.DA102 != "" and state.DA102.startswith("1"):
             MarcaModello = "ELKEY|BUBBLE"
-        if DA102 != "" and DA102 == "ELK Bubble":
+        if state.DA102 != "" and state.DA102 == "ELK Bubble":
             MarcaModello = "ELKEY|BUBBLE"
 
     return MarcaModello
 
-def show_info_vending_machine_tag():
-    global ID101,ID102, CA101, CA102, VA101, CA201, DA201, CA305, DA401, DB401, CA1002, CA307, CA403, CA404 , ID705, DA102
-    global DA503,DB503,CA702,CA706,DA507,DB507,DB201, TA201, TA205 , DA301 , DB301, DB505, DA505,EA302,EA303,EA305,EA306,EA301
-    
+def show_info_vending_machine_tag(state):
     try:
-        VA101  = float(VA101)
-        CA201  = float(CA201)
-        DA201  = float(DA201)
-        DB201  = float(DB201)
-        CA305  = float(CA305)
-        DA401  = float(DA401)
-        DB401  = float(DB401)
-        CA1002 = float(CA1002)
-        CA307  = float(CA307)
-        CA403  = float(CA403)
-        CA404  = float(CA404)
-        DA503  = float(DA503)
-        DB503 = float(DB503)
-        CA702  = float(CA702)
-        CA706  = float(CA706)
-        DA507  = float(DA507)
-        DB507  = float(DB507)
-        TA201  = float(TA201)
-        TA205  = float(TA205)
-        DA301  = float(DA301)
-        DA301  = float(DB301)
-        DB505  = float(DB505)
-        DA505  = float(DA505)
-        CA102  = CA102
-        EA301 = EA301
-        EA302 = EA302
-        EA303 = EA303
-        EA305 = EA305
-        EA306 = EA306
-        ID102 = ID102
-        ID705 = ID705
-        DA102 = DA102
+        state.VA101  = float(state.VA101)
+        state.CA201  = float(state.CA201)
+        state.DA201  = float(state.DA201)
+        state.DB201  = float(state.DB201)
+        state.CA305  = float(state.CA305)
+        state.DA401  = float(state.DA401)
+        state.DB401  = float(state.DB401)
+        state.CA1002 = float(state.CA1002)
+        state.CA307  = float(state.CA307)
+        state.CA403  = float(state.CA403)
+        state.CA404  = float(state.CA404)
+        state.DA503  = float(state.DA503)
+        state.DB503  = float(state.DB503)
+        state.CA702  = float(state.CA702)
+        state.CA706  = float(state.CA706)
+        state.DA507  = float(state.DA507)
+        state.DB507  = float(state.DB507)
+        state.TA201  = float(state.TA201)
+        state.TA205  = float(state.TA205)
+        state.DA301  = float(state.DA301)
+        state.DB301  = float(state.DB301)
+        state.DB505  = float(state.DB505)
+        state.DA505  = float(state.DA505)
+        state.CA102  = state.CA102
+        state.EA301 = state.EA301
+        state.EA302 = state.EA302
+        state.EA303 = state.EA303
+        state.EA305 = state.EA305
+        state.EA306 = state.EA306
+        state.ID102 = state.ID102
+        state.ID705 = state.ID705
+        state.DA102 = state.DA102
 
-        if CA101 == "":
-            id_gettoniera = ID101
+        if state.CA101 == "":
+            id_gettoniera = state.ID101
         else:
-            id_gettoniera = CA101
+            id_gettoniera = state.CA101
 
-        cumulative_values = [
+        cumulative_info_values = [
             ("DATI VENDING MACHINE",""),
             ("DATI DELLA GETTONIERA", id_gettoniera),
-            ("MODELLO GETTONIERA", RicavaMarcaModelloGettoniera()),
-            ("ProgressivoPrelievo", EA301),
-            ("DATA DI QUESTA LETTURA", EA302),
-            ("ORA DI QUESTA LETTURA", EA303),
-            ("DataOraPrelievoPrecedente: ", EA305 + " " +EA306),
+            ("MODELLO GETTONIERA", RicavaMarcaModelloGettoniera(state)),
+            ("ProgressivoPrelievo", state.EA301),
+            ("DATA DI QUESTA LETTURA", state.EA302),
+            ("ORA DI QUESTA LETTURA", state.EA303),
+            ("DataOraPrelievoPrecedente: ", state.EA305 + " " + state.EA306),
             ("___________________________________________________________________",""),
-            ("VALORI CUMULATI DELLA MACCHINA - NUOVA FORMULA",""),
-            ("Venduto", f"{convert_to_decimal(VA101)}€"),
-            ("VendutoContante", f"{convert_to_decimal(CA201)}€"),
-            ("VendutoNoContante", f"{convert_to_decimal(DA201)}€"),
-            ("Incassato", f"{convert_to_decimal(CA305)}€"),
-            ("IncassatoRicarica", f"{convert_to_decimal(DA401 + DB401)}€"),
-            ("IncassatoVendita", f"{convert_to_decimal(CA305 - (DA401 + DB401) - CA1002)}€"),
-            ("___________________________________________________________________",""),
-            ("VALORI CUMULATI DELLA MACCHINA - FORMULA MEI | CPI",""),
-            ("Venduto", f"{convert_to_decimal( (VA101-DA503-DB503-CA702) + (CA706+DA507+DB507) )}€"),
-            ("VendutoContante", f"{convert_to_decimal( (CA201-CA702) + CA706 )}€"),
-            ("VendutoNoContante", f"{convert_to_decimal( (DA201+DB201) - (DA503+TA201+TA205+DA507+DB507) )}€"),
-            ("Incassato   ", f"{convert_to_decimal(CA305)}€"),
-            ("IncassatoRicarica", f"{convert_to_decimal(valida_scelta_campo(DA201,DA301,'>',0) + valida_scelta_campo(DB201,DB301,'>',0) + DA401 + DB401 - (DA301 - DB301 - DB505 - DA505))}€"),
-            ("IncassatoVendita   ", f"{convert_to_decimal(CA305 - CA1002 - DA401 - DB401)}€"),
-            ("___________________________________________________________________",""),
-            ("VALORI CUMULATI DELLA MACCHINA - FORMULA MHD | MICROHARD",""),
-            ("Venduto", f"{convert_to_decimal(VA101)}€"),
-            ("VendutoContante", f"{convert_to_decimal( (CA201-CA702) + CA706 )}€"),
-            ("VendutoNoContante", f"{convert_to_decimal( (DA201+DB201) - (DA503+TA201+TA205+DA507+DB507) )}€"),
-            ("Incassato   ", f"{convert_to_decimal(CA305 + DA301 + DB301)}€"),
-            ("IncassatoRicarica   ", f"{convert_to_decimal(DA401 + DB401)}€"),
-            ("IncassatoVendita   ", f"{convert_to_decimal(CA305 - CA1002 - DA401 - DB401)}€"),
-            ("___________________________________________________________________",""),
-            ("VALORI CUMULATI DELLA MACCHINA IDENTICI PER TUTTE LE ECCEZIONI",""),
-            ("TotaleResoTubiResto", f"{convert_to_decimal(CA403)}€"),
-            ("TotaleCaricatoTubiResto", f"{convert_to_decimal(CA307)}€"),
-            ("TotaleResoManualeTubiResto", f"{convert_to_decimal(CA404)}€"),
-            ("TotaleCaricatoManualeTubiResto", f"{convert_to_decimal(CA1002)}€"),
         ]
+
+        cumulative_newformula_values = [
+            ("VALORI CUMULATI DELLA MACCHINA - NUOVA FORMULA",""),
+            ("Venduto", f"{convert_to_decimal(state.VA101)}€"),
+            ("VendutoContante", f"{convert_to_decimal(state.CA201)}€"),
+            ("VendutoNoContante", f"{convert_to_decimal(state.DA201)}€"),
+            ("Incassato", f"{convert_to_decimal(state.CA305)}€"),
+            ("IncassatoRicarica", f"{convert_to_decimal(state.DA401 + state.DB401)}€"),
+            ("IncassatoVendita", f"{convert_to_decimal(state.CA305 - (state.DA401 + state.DB401) - state.CA1002)}€"),
+            ("___________________________________________________________________",""),
+        ]
+
+        cumulative_meiformula_values = [
+            ("VALORI CUMULATI DELLA MACCHINA - FORMULA MEI | CPI",""),
+            ("Venduto", f"{convert_to_decimal( (state.VA101-state.DA503-state.DB503-state.CA702) + (state.CA706+state.DA507+state.DB507) )}€"),
+            ("VendutoContante", f"{convert_to_decimal( (state.CA201-state.CA702) + state.CA706 )}€"),
+            ("VendutoNoContante", f"{convert_to_decimal( (state.DA201+state.DB201) - (state.DA503+state.TA201+state.TA205+state.DA507+state.DB507) )}€"),
+            ("Incassato   ", f"{convert_to_decimal(state.CA305)}€"),
+            ("IncassatoRicarica", f"{convert_to_decimal(valida_scelta_campo(state.DA201,state.DA301,'>',0) + valida_scelta_campo(state.DB201,state.DB301,'>',0) + state.DA401 + state.DB401 - (state.DA301 - state.DB301 - state.DB505 - state.DA505))}€"),
+            ("IncassatoVendita   ", f"{convert_to_decimal(state.CA305 - state.CA1002 - state.DA401 - state.DB401)}€"),
+            ("___________________________________________________________________",""),
+        ]
+        
+        cumulative_mhdformula_values = [
+            ("VALORI CUMULATI DELLA MACCHINA - FORMULA MHD | MICROHARD",""),
+            ("Venduto", f"{convert_to_decimal(state.VA101)}€"),
+            ("VendutoContante", f"{convert_to_decimal( (state.CA201-state.CA702) + state.CA706 )}€"),
+            ("VendutoNoContante", f"{convert_to_decimal( (state.DA201+state.DB201) - (state.DA503+state.TA201+state.TA205+state.DA507+state.DB507) )}€"),
+            ("Incassato   ", f"{convert_to_decimal(state.CA305 + state.DA301 + state.DB301)}€"),
+            ("IncassatoRicarica   ", f"{convert_to_decimal(state.DA401 + state.DB401)}€"),
+            ("IncassatoVendita   ", f"{convert_to_decimal(state.CA305 - state.CA1002 - state.DA401 - state.DB401)}€"),
+            ("___________________________________________________________________",""),
+        ]
+        
+        cumulative_genericException_values = [
+            ("VALORI CUMULATI DELLA MACCHINA IDENTICI PER TUTTE LE ECCEZIONI",""),
+            ("TotaleResoTubiResto    ", f"{convert_to_decimal(state.DA503+state.DB503)}€"),
+            ("TotalePrelevatoTubiResto   ", f"{convert_to_decimal(state.CA702)}€"),
+            ("TotaleCaricatoTubiResto   ", f"{convert_to_decimal(state.CA706+state.DA507+state.DB507)}€"),
+            ("TotaleIncassatoMeccanico   ", f"{convert_to_decimal(state.DA301+state.DB301)}€"),
+            ("TotaleIncassatoBillValidator   ", f"{convert_to_decimal(state.DA505+state.DB505)}€")
+        ]
+
+        cumulative_values = cumulative_info_values + cumulative_newformula_values + cumulative_meiformula_values
+
+        """ aggiungere qui le somme in base al modello della gettoniera uscito """
+
+
+        cumulative_values = cumulative_values + cumulative_genericException_values
 
         # Pulizia del widget tk.Text
         info_text.config(state=tk.NORMAL)
@@ -265,14 +272,12 @@ def show_info_vending_machine_tag():
         info_text.config(state=tk.DISABLED)
         
         # Azzeramento delle variabili
-        azzera()
+        state.azzera()
     
     except ValueError as e:
         print(f"Errore di conversione: {e}")
 
-def lettura_tag(full_tag, initial_tag, part, i_max, j_max):
-    global ID101, ID102, CA101, CA102, VA101, CA201, DA201, CA305, DA401, DB401, CA1002, CA307, CA403, CA404, ID705, DA102
-    global DA503,DB503,CA702,CA706,DA507,DB507,DB201, TA201, TA205 , DA301 , DB301, DB505, DA505,EA302,EA303,EA305,EA306,EA301
+def lettura_tag(full_tag, initial_tag, part, i_max, j_max,state):
 
     for i in range(1, i_max + 1):
         if j_max > 0:
@@ -282,99 +287,100 @@ def lettura_tag(full_tag, initial_tag, part, i_max, j_max):
                     tag_tree.insert("", tk.END, values=(full_tag, part, description), tags=('custom_tag',))
                     inserted_tags.add(full_tag)
                     if full_tag == "ID101":
-                        ID101 = part
+                        state.ID101 = part
                     if full_tag == "ID102":
-                        ID102 = part
+                        state.ID102 = part
                     if full_tag == "ID705":
-                        ID705 = part
+                        state.ID705 = part
                     elif full_tag == "VA101":
-                        VA101 = float(part)
+                        state.VA101 = float(part)
                     if full_tag == "ID101":
-                        ID101 = part
+                        state.ID101 = part
                     elif full_tag == "EA301":
-                        EA301 = part
+                        state.EA301 = part
                     elif full_tag == "EA302":
                         if len(part) >= 6:
-                            EA302 = convertTagToData(part)
+                            state.EA302 = convertTagToData(part)
                     elif full_tag == "EA303":
                         if len(part) >= 4:
-                            EA303 = convertTagToTime(part)
+                            state.EA303 = convertTagToTime(part)
                     elif full_tag == "EA305":
                         if len(part) >= 6:
-                            EA305 = convertTagToData(part)
+                            state.EA305 = convertTagToData(part)
                     elif full_tag == "EA306":
                         if len(part) >= 4:
-                            EA306 = convertTagToTime(part)
+                            state.EA306 = convertTagToTime(part)
                     elif full_tag == "CA101":
-                        CA101 = part
+                        state.CA101 = part
                     elif full_tag == "CA102":
-                        CA102 = part
+                        state.CA102 = part
                     elif full_tag == "DA503":
-                        DA503 = float(part)
+                        state.DA503 = float(part)
                     elif full_tag == "DB503":
-                        DB503 = float(part)
+                        state.DB503 = float(part)
                     elif full_tag == "CA702":
-                        CA702 = float(part)
+                        state.CA702 = float(part)
                     elif full_tag == "CA706":
-                        CA706 = float(part)
+                        state.CA706 = float(part)
                     elif full_tag == "DA507":
-                        DA507 = float(part)
+                        state.DA507 = float(part)
                     elif full_tag == "DB507":
-                        DB507 = float(part)
+                        state.DB507 = float(part)
                     elif full_tag == "DA201":
-                        DA201 = float(part)
+                        state.DA201 = float(part)
                     elif full_tag == "DB201":
-                        DB201 = float(part)
+                        state.DB201 = float(part)
                     elif full_tag == "CA305":
-                        CA305 = float(part)
+                        state.CA305 = float(part)
                     elif full_tag == "DA102":
-                        DA102 = float(part)
+                        state.DA102 = float(part)
                     elif full_tag == "DA401":
-                        DA401 = float(part)
+                        state.DA401 = float(part)
                     elif full_tag == "DB401":
-                        DB401 = float(part)
+                        state.DB401 = float(part)
                     elif full_tag == "CA1002":
-                        CA1002 = float(part)
+                        state.CA1002 = float(part)
                     elif full_tag == "CA307":
-                        CA307 = float(part)
+                        state.CA307 = float(part)
                     elif full_tag == "CA403":
-                        CA403 = float(part)
+                        state.CA403 = float(part)
                     elif full_tag == "CA404":
-                        CA404 = float(part)
+                        state.CA404 = float(part)
                     elif full_tag == "TA201":
-                        TA201 = float(part)
+                        state.TA201 = float(part)
                     elif full_tag == "TA205":
-                        TA205 = float(part)
+                        state.TA205 = float(part)
                     elif full_tag == "DA301":
-                        DA301 = float(part)
+                        state.DA301 = float(part)
                     elif full_tag == "DB301":
-                        DB301 = float(part)
+                        state.DB301 = float(part)
                     elif full_tag == "DB505":
-                        DB505 = float(part)
+                        state.DB505 = float(part)
                     elif full_tag == "DA505":
-                        DA505 = float(part)
+                        state.DA505 = float(part)
                 else:
                     if full_tag not in inserted_tags:
                         description = tag_descriptions.get(full_tag, "Nessuna descrizione disponibile")
                         tag_tree.insert("", tk.END, values=(full_tag, part, description), tags=('custom_tag',))
                         inserted_tags.add(full_tag)
 
-def selettore_tag(tag, formatted_index, part):
+def selettore_tag(tag, formatted_index, part, state):
     full_tag = tag + formatted_index
-    lettura_tag(full_tag, "ID", part, 9, 11) , lettura_tag(full_tag, "ID1", part, 8, 10) ,lettura_tag(full_tag, "EA", part, 9, 10)
-    lettura_tag(full_tag, "CA", part, 10, 8) , lettura_tag(full_tag, "MA", part, 9, 11)
-    lettura_tag(full_tag, "PA", part, 8, 10) , lettura_tag(full_tag, "TA", part, 10, 8)
-    lettura_tag(full_tag, "VA", part, 3, 9)  , lettura_tag(full_tag, "DXS", part, 6, 0)
-    lettura_tag(full_tag, "ST", part, 2, 0)  , lettura_tag(full_tag, "LA", part, 5, 0)
-    lettura_tag(full_tag, "AM", part, 5, 0)  , lettura_tag(full_tag, "SE", part, 2, 0)
-    lettura_tag(full_tag, "DXE", part, 2, 0) , lettura_tag(full_tag, "G85", part, 1, 0)
+    lettura_tag(full_tag, "ID", part, 9, 11,state) , lettura_tag(full_tag, "ID1", part, 8, 10,state)
+    lettura_tag(full_tag, "EA", part, 9, 10,state)
+    lettura_tag(full_tag, "CA", part, 10, 8,state) , lettura_tag(full_tag, "MA", part, 9, 11,state)
+    lettura_tag(full_tag, "PA", part, 8, 10,state) , lettura_tag(full_tag, "TA", part, 10, 8,state)
+    lettura_tag(full_tag, "VA", part, 3, 9,state)  , lettura_tag(full_tag, "DXS", part, 6, 0,state)
+    lettura_tag(full_tag, "ST", part, 2, 0,state)  , lettura_tag(full_tag, "LA", part, 5, 0,state)
+    lettura_tag(full_tag, "AM", part, 5, 0,state)  , lettura_tag(full_tag, "SE", part, 2, 0,state)
+    lettura_tag(full_tag, "DXE", part, 2, 0,state) , lettura_tag(full_tag, "G85", part, 1, 0,state)
 
 #------------------------------------------------------------------------------------------------------------------------------
-def apri_file():
+def apri_file(state):
     file_path = filedialog.askopenfilename()
     if file_path:
         dir_path, file_name = os.path.split(file_path)
-        leggi_file(dir_path, file_name)
+        leggi_file(dir_path, file_name,state)
 
 # Creazione della finestra principale
 root = tk.Tk()
@@ -382,9 +388,10 @@ root.title("SIEVADTSOFT")
 root.geometry("1200x700")
 root.resizable(False, False)
 root.configure(bg=COLOR_PRIMARY)
+global_state = GlobalState()
 
 # Creazione dell'interfaccia grafica
-tag_tree, frame, info_text = crea_interfaccia(root)
+tag_tree, frame, info_text = crea_interfaccia(root,global_state)
 
 # Avvio della finestra
 root.mainloop()
