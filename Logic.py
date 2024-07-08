@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import filedialog, ttk, messagebox
 import re
 import os
-from function import convert_to_decimal, valida_condizione
+from function import convert_to_decimal,valida_scelta_campo
 
 # Importa il dizionario tag_descriptions dal modulo tag.py
 from tag import tag_descriptions
@@ -171,41 +171,28 @@ def show_info_vending_machine_tag():
             ("EA303: ORA DI QUESTA LETTURA", time),
             ("___________________________________________________________________",""),
             ("VALORI CUMULATI DELLA MACCHINA - NUOVA FORMULA",""),
-            ("VA101: VENDUTO", f"{convert_to_decimal(VA101)}€"),
-            ("CA201: VENDUTO CONTANTE CUMULATO", f"{convert_to_decimal(CA201)}€"),
-            ("DA201: VENDUTO NO CONTANTE CUMULATO", f"{convert_to_decimal(DA201)}€"),
-            ("CA305: INCASSO CUMULATO", f"{convert_to_decimal(CA305)}€"),
-            ("(CA305 - (DA401 + DB401) - CA1002): INCASSO PER VENDITA CUMULATO", f"{convert_to_decimal(CA305 - (DA401 + DB401) - CA1002)}€"),
-
-            ("DA401: VALORE ACCREDITATO SU CASHLESS 1", f"{convert_to_decimal(DA401)}€"),
-            ("DB401: VALORE ACCREDITATO SU CASHLESS 2", f"{convert_to_decimal(DB401)}€"),
-            ("DA401 + DB401: INCASSO PER RICARICA CUMULATO", f"{convert_to_decimal(DA401 + DB401)}€"),
-            
-            ("CA403: TOTALE RESO TUBI RESTO CUMULATO", f"{convert_to_decimal(CA403)}€"),
-            ("CA307: VALORE TOTALE MONETE AGGIUNTE CUMULATO", f"{convert_to_decimal(CA307)}€"),
-            ("CA404: TOTALE RESO MANUALE TUBI RESTO CUMULATO", f"{convert_to_decimal(CA404)}€"),
-            ("CA1002: VALORE TOTALE MONETE AGGIUNTE MANUALMENTE CUMULATO", f"{convert_to_decimal(CA1002)}€"),
+            ("Venduto", f"{convert_to_decimal(VA101)}€"),
+            ("VendutoContante", f"{convert_to_decimal(CA201)}€"),
+            ("VendutoNoContante", f"{convert_to_decimal(DA201)}€"),
+            ("Incassato", f"{convert_to_decimal(CA305)}€"),
+            ("IncassatoRicarica", f"{convert_to_decimal(DA401 + DB401)}€"),
+            ("IncassatoVendita", f"{convert_to_decimal(CA305 - (DA401 + DB401) - CA1002)}€"),
+            ("TotaleResoTubiResto", f"{convert_to_decimal(CA403)}€"),
+            ("TotaleCaricatoTubiResto", f"{convert_to_decimal(CA307)}€"),
+            ("TotaleResoManualeTubiResto", f"{convert_to_decimal(CA404)}€"),
+            ("TotaleCaricatoManualeTubiResto", f"{convert_to_decimal(CA1002)}€"),
             ("___________________________________________________________________",""),
-            ("VALORI CUMULATI DELLA MACCHINA - OLD FORMULA MEI | CPI",""),
+            ("VALORI CUMULATI DELLA MACCHINA - FORMULA MEI | CPI",""),
             ("Venduto", f"{convert_to_decimal( (VA101-DA503-DB503-CA702) + (CA706+DA507+DB507) )}€"),
             ("VendutoContante", f"{convert_to_decimal( (CA201-CA702) + CA706 )}€"),
             ("VendutoNoContante", f"{convert_to_decimal( (DA201+DB201) - (DA503+TA201+TA205+DA507+DB507) )}€"),
             ("Incassato   ", f"{convert_to_decimal(CA305)}€"),
-            #("IncassatoRicarica", f"{convert_to_decimal(valida_condizione(DA201, f'{DA301}|>|0|') + valida_condizione(DB201, f'{DB301}|>|0|') + DA401 + DB401 - (DA301 - DB301 - DB505 - DA505))}€"),
+            ("IncassatoRicarica", f"{convert_to_decimal(valida_scelta_campo(DA201,DA301,'>',0) + valida_scelta_campo(DB201,DB301,'>',0) + DA401 + DB401 - (DA301 - DB301 - DB505 - DA505))}€"),
             ("IncassatoVendita   ", f"{convert_to_decimal(CA305 - CA1002 - DA401 - DB401)}€"),
-
-            """ valori CUMULATO della gettoniera ->  MEI | CPI
-            Venduto                        = VA101-DA503-DB503-CA702+CA706+DA507+DB507
-            VendutoContante                = CA201-CA702+CA706
-            VendutoNoContante              = DA201+DB201-DA503-DB503+TA201+TA205+DA507+DB507
-            Incassato                      = CA305
-            IncassatoRicarica              = DA201(DA301|>|0|) + DB201(DB301|>|0|) + DA401 + DB401 - DA301 - DB301 - DB505 - DA505
-            IncassatoVendita               = CA305 - CA1002 - DA401 - DB401
-
-            TotaleResoTubiResto            = CA403
-            TotaleCaricatoTubiResto        = CA307
-            TotaleResoManualeTubiResto     = CA404
-            TotaleCaricatoManualeTubiResto = CA1002 """
+            ("TotaleResoTubiResto", f"{convert_to_decimal(CA403)}€"),
+            ("TotaleCaricatoTubiResto", f"{convert_to_decimal(CA307)}€"),
+            ("TotaleResoManualeTubiResto", f"{convert_to_decimal(CA404)}€"),
+            ("TotaleCaricatoManualeTubiResto", f"{convert_to_decimal(CA1002)}€"),
         ]
 
         # Pulizia del widget tk.Text

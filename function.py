@@ -23,58 +23,41 @@ def convert_to_decimal(value):
     return result
 
 
-#vedi file di testo cpi_calcolo_cumulati.txt per il funzionamento logico
-def valida_condizione(campo, condizione):
-    # Dividi la condizione in tre parti: campo1, operatore, valore
-    parti = condizione.split('|')
-    if len(parti) != 3:
-        raise ValueError("La condizione non è nel formato corretto")
+""" es. DA201(DA301|>|0|)
+prendi DA201 solo se DA301 è > a 0 """   
+#      campo,seleziona,condizione,valore
+""" es. DA201(DA301|      >        |0|)"""
+def valida_scelta_campo(campo,seleziona,condizione,valore):
+    #Logica: es. DA201(DA301|>|0|) seleziona DA201 solo se DA301 è > a 0
 
-    campo1, operatore, valore = parti
+    #prendi campo solo se seleziona è condizione a valore
 
-    # Rimuovi spazi extra
-    campo1 = campo1.strip()
-    operatore = operatore.strip()
-    valore = valore.strip()
-
-    # Gestisci le operazioni supportate (es. =, >, <, >=, <=, <>)
-    if operatore == '=':
-        return campo == campo1 and campo1 == valore
-    elif operatore == '>':
-        try:
-            return campo == campo1 and float(campo1) > float(valore)
-        except ValueError:
-            return False
-    elif operatore == '<':
-        try:
-            return campo == campo1 and float(campo1) < float(valore)
-        except ValueError:
-            return False
-    elif operatore == '>=':
-        try:
-            return campo == campo1 and float(campo1) >= float(valore)
-        except ValueError:
-            return False
-    elif operatore == '<=':
-        try:
-            return campo == campo1 and float(campo1) <= float(valore)
-        except ValueError:
-            return False
-    elif operatore == '<>':
-        return campo == campo1 and campo1 != valore
-    else:
-        raise ValueError(f"Operatore non supportato: {operatore}")
+    if condizione == "=":
+        if seleziona == valore:
+            return campo
+        else: return 0
     
-    # Esempi di utilizzo:
+    if condizione == ">":
+        if seleziona > valore:
+            return campo
+        else: return 0
 
-    # Condizione: EA204(EA201|=|VALORE|)
-    """ campo = "EA204"
-    condizione = "EA201|=|VALORE|"
-    valido = valida_condizione(campo, condizione)
-    print(f"Il campo '{campo}' soddisfa la condizione '{condizione}': {valido}")
+    if condizione == "<":
+        if seleziona < valore:
+            return campo
+        else: return 0
+    
+    if condizione == ">=":
+        if seleziona >= valore:
+            return campo
+        else: return 0
 
-    # Condizione: DA201(DA301|>|0|)
-    campo = "DA201"
-    condizione = "DA301|>|0|"
-    valido = valida_condizione(campo, condizione)
-    print(f"Il campo '{campo}' soddisfa la condizione '{condizione}': {valido}") """
+    if condizione == "<=":
+        if seleziona <= valore:
+            return campo
+        else: return 0
+
+    if condizione == "<>":
+        if seleziona != valore:
+            return campo
+        else: return 0
