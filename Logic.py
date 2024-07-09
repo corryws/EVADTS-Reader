@@ -125,45 +125,72 @@ def RicavaMarcaModelloGettoniera(state):
         if state.ID102 != "":
             if state.ID102 in ["93", "97", "77", "64", "76", "38", "30", "AETERNA", "85"]:
                 MarcaModello = "COGES|" + state.ID102
+                return MarcaModello + "|" + state.DXS03
         elif state.CA101.startswith("COG"):
             if state.CA403 == "":
-                MarcaModello = "COGES|IDEA4COL"
+                MarcaModello = "COGES|IDEA4COL" 
+                return MarcaModello + "|" + state.DXS03
 
     # RICAVO MODELLO PAYTEC
     if MarcaModello == "":
         if state.ID102 != "":
             if state.ID102.startswith("FAG"):
-                MarcaModello = "PAYTEC|PAYTECV0"
+                # Controlla l'ultimo carattere di state.MA502
+                if state.MA502[-1] in ["1", "2", "3", "4"]:
+                    MarcaModello = f"PAYTEC|PAYTECV{state.MA502[-1]}"
+                    return MarcaModello
 
     # RICAVO MODELLO SUZOHAPP
     if MarcaModello == "":
         if state.CA102 != "" and state.CA102.startswith("C2"):
             MarcaModello = "SUZ0HAPP|CURRENZA"
+            return MarcaModello
     
     if state.ID102 != "":
         if  state.ID102.startswith("WKL"):
             MarcaModello = "SUZ0HAPP|WORLDKEY"
+            return MarcaModello
         elif state.ID102.startswith("EKN"):
             MarcaModello = "SUZ0HAPP|EURO KEY NEXT"
+            return MarcaModello
 
     if state.ID705 != "":
         if  state.ID705.startswith("WKL"):
             MarcaModello = "SUZ0HAPP|WORLDKEY"
+            return MarcaModello
         elif state.ID705.startswith("EKN"):
             MarcaModello = "SUZ0HAPP|EURO KEY NEXT"
+            return MarcaModello
 
     # RICAVO MODELLO ELKEY
     if MarcaModello == "":
         if state.DA102 != "" and state.DA102.startswith("1"):
             MarcaModello = "ELKEY|BUBBLE"
+            return MarcaModello
         if state.DA102 != "" and state.DA102 == "ELK Bubble":
             MarcaModello = "ELKEY|BUBBLE"
+            return MarcaModello
+
+    # RICAVO MODELLO GENERICO
+    if MarcaModello == "":
+        MarcaModello = ""
+    else:
+        if isinstance(state.ID101, int):
+            state.ID101 = str(state.ID101) 
+
+        if state.ID101 != "" and not state.ID101[0].isdigit():
+            first_three_chars = state.ID101[:3]
+            MarcaModello = first_three_chars + "|XXX"
+        else:
+            MarcaModello = ""
+
 
     return MarcaModello
 
 def show_info_vending_machine_tag(state):
     try:
         state.VA101  = float(state.VA101)
+        state.VA301  = float(state.VA301)
         state.CA201  = float(state.CA201)
         state.DA201  = float(state.DA201)
         state.DB201  = float(state.DB201)
@@ -186,6 +213,8 @@ def show_info_vending_machine_tag(state):
         state.DB301  = float(state.DB301)
         state.DB505  = float(state.DB505)
         state.DA505  = float(state.DA505)
+        state.DB601  = float(state.DB601)
+        state.DA601  = float(state.DA601)
         state.CA102  = state.CA102
         state.EA301 = state.EA301
         state.EA302 = state.EA302
@@ -195,16 +224,20 @@ def show_info_vending_machine_tag(state):
         state.ID102 = state.ID102
         state.ID705 = state.ID705
         state.DA102 = state.DA102
+        state.MA502 = state.MA502 
+        state.DXS03 = state.DXS03 
 
         if state.CA101 == "":
             id_gettoniera = state.ID101
         else:
             id_gettoniera = state.CA101
+        
+        MarcaModello = RicavaMarcaModelloGettoniera(state)
 
         cumulative_info_values = [
             ("DATI VENDING MACHINE",""),
             ("DATI DELLA GETTONIERA", id_gettoniera),
-            ("MODELLO GETTONIERA", RicavaMarcaModelloGettoniera(state)),
+            ("MODELLO GETTONIERA", MarcaModello),
             ("ProgressivoPrelievo", state.EA301),
             ("DATA DI QUESTA LETTURA", state.EA302),
             ("ORA DI QUESTA LETTURA", state.EA303),
@@ -214,7 +247,7 @@ def show_info_vending_machine_tag(state):
 
         cumulative_newformula_values = [
             ("VALORI CUMULATI DELLA MACCHINA - NUOVA FORMULA",""),
-            ("Venduto", f"{convert_to_decimal(state.VA101)}€"),
+            ("Venduto", f"{convert_to_decimal(state.VA101 - state.DA503 - state.DB503 - state.CA702)}€"),
             ("VendutoContante", f"{convert_to_decimal(state.CA201)}€"),
             ("VendutoNoContante", f"{convert_to_decimal(state.DA201)}€"),
             ("Incassato", f"{convert_to_decimal(state.CA305)}€"),
@@ -224,7 +257,7 @@ def show_info_vending_machine_tag(state):
         ]
 
         cumulative_meiformula_values = [
-            ("VALORI CUMULATI DELLA MACCHINA - FORMULA MEI | CPI",""),
+            ("VALORI CUMULATI DELLA MACCHINA - FORMULA MEI | CPI - GENERICO",""),
             ("Venduto", f"{convert_to_decimal( (state.VA101-state.DA503-state.DB503-state.CA702) + (state.CA706+state.DA507+state.DB507) )}€"),
             ("VendutoContante", f"{convert_to_decimal( (state.CA201-state.CA702) + state.CA706 )}€"),
             ("VendutoNoContante", f"{convert_to_decimal( (state.DA201+state.DB201) - (state.DA503+state.TA201+state.TA205+state.DA507+state.DB507) )}€"),
@@ -233,6 +266,26 @@ def show_info_vending_machine_tag(state):
             ("IncassatoVendita   ", f"{convert_to_decimal(state.CA305 - state.CA1002 - state.DA401 - state.DB401)}€"),
             ("___________________________________________________________________",""),
         ]
+
+        cumulative_nriformula_values = [
+            ("VALORI CUMULATI DELLA MACCHINA - FORMULA MEI | CPI - GENERICO",""),
+            ("Venduto", f"{convert_to_decimal( (state.VA101-state.DA503-state.DB503-state.CA702) + (state.CA706+state.DA507+state.DB507) )}€"),
+            ("VendutoContante", f"{convert_to_decimal( (state.CA201-state.CA702) + state.CA706 )}€"),
+            ("VendutoNoContante", f"{convert_to_decimal( (state.DA201+state.DB201) - (state.DA503+state.TA201+state.TA205+state.DA507+state.DB507) )}€"),
+            ("Incassato   ", f"{convert_to_decimal(state.CA305)}€"),
+            ("IncassatoRicarica", f"{convert_to_decimal(valida_scelta_campo(state.DA201,state.DA301,'>',0) + valida_scelta_campo(state.DB201,state.DB301,'>',0) + state.DA401 + state.DB401 - (state.DA301 - state.DB301 - state.DB505 - state.DA505))}€"),
+            ("IncassatoVendita   ", f"{convert_to_decimal(state.CA305 - state.CA1002 - state.DA401 - state.DB401)}€"),
+            ("___________________________________________________________________",""),
+        ]
+
+
+        """ valori CUMULATO della gettoniera NRI | SUZ0HAPP
+        Venduto                        = VA101 - DA503 - DB503
+        VendutoContante                = CA201 - CA702 + CA706 ☑️
+        VendutoNoContante              = DA201 + DB201 - DA503 - DB503 + TA201 + TA205
+        Incassato                      = CA305 ☑️
+        IncassatoRicarica              = DA201(DA301|>|0|) + DB201(DB301|>|0|) + DA401 + DB401 - DA301 - DB301 - DA503 - DB503 - DA601 - DB601
+        IncassatoVendita               = CA305 - CA1002 - DA401 - DB401 ☑️ """
         
         cumulative_mhdformula_values = [
             ("VALORI CUMULATI DELLA MACCHINA - FORMULA MHD | MICROHARD",""),
@@ -242,6 +295,39 @@ def show_info_vending_machine_tag(state):
             ("Incassato   ", f"{convert_to_decimal(state.CA305 + state.DA301 + state.DB301)}€"),
             ("IncassatoRicarica   ", f"{convert_to_decimal(state.DA401 + state.DB401)}€"),
             ("IncassatoVendita   ", f"{convert_to_decimal(state.CA305 - state.CA1002 - state.DA401 - state.DB401)}€"),
+            ("___________________________________________________________________",""),
+        ]
+
+        cumulative_cogformulav0_values = [
+            ("VALORI CUMULATI DELLA MACCHINA - FORMULA COG | COGES V0",""),
+            ("Venduto", f"{convert_to_decimal(state.VA101 + state.VA301)}€"),
+            ("VendutoContante", f"{convert_to_decimal( (state.CA201))}€"),
+            ("VendutoNoContante", f"{convert_to_decimal( state.VA101 + state.CA201)}€"),
+            ("Incassato   ", f"{convert_to_decimal(state.CA305)}€"),
+            ("IncassatoRicarica   ", f"{convert_to_decimal((state.DA401 + state.DA601) - (state.DB401 - state.DB601))}€"),
+            ("IncassatoVendita   ", f"{convert_to_decimal((state.CA305 - state.CA1002 - state.DA401) + (state.DA601) - state.DB401 + (state.DB601))}€"),
+            ("___________________________________________________________________",""),
+        ]
+
+        cumulative_cogformulav1_values = [
+            ("VALORI CUMULATI DELLA MACCHINA - FORMULA COG | COGES V1",""),
+            ("Venduto", f"{convert_to_decimal(state.VA101 + state.VA301)}€"),
+            ("VendutoContante", f"{convert_to_decimal( (state.CA201))}€"),
+            ("VendutoNoContante", f"{convert_to_decimal( state.VA101 + state.CA201)}€"),
+            ("Incassato   ", f"{convert_to_decimal(state.CA305)}€"),
+            ("IncassatoRicarica   ", f"{convert_to_decimal((state.DA401 + state.DA601))}€"),
+            ("IncassatoVendita   ", f"{convert_to_decimal((state.CA305 - state.CA1002 - state.DA401) + (state.DA601))}€"),
+            ("___________________________________________________________________",""),
+        ]
+        
+        cumulative_cogformulav2_values = [
+            ("VALORI CUMULATI DELLA MACCHINA - FORMULA COG | COGES V2",""),
+            ("Venduto", f"{convert_to_decimal(state.VA101)}€"),
+            ("VendutoContante", f"{convert_to_decimal( (state.CA201))}€"),
+            ("VendutoNoContante", f"{convert_to_decimal( state.VA101 + state.CA201)}€"),
+            ("Incassato   ", f"{convert_to_decimal(state.CA305)}€"),
+            ("IncassatoRicarica   ", f"{convert_to_decimal((state.DA401))}€"),
+            ("IncassatoVendita   ", f"{convert_to_decimal((state.CA305 - state.DA401) + (state.DA601))}€"),
             ("___________________________________________________________________",""),
         ]
         
@@ -257,7 +343,89 @@ def show_info_vending_machine_tag(state):
         cumulative_values = cumulative_info_values + cumulative_newformula_values + cumulative_meiformula_values
 
         """ aggiungere qui le somme in base al modello della gettoniera uscito """
+        #Controllo Marca Modello
+        # Aggiunta di controlli per tutte le variazioni di MarcaModello
 
+        if MarcaModello == "MEI|CF8000EXEC":
+            # Fai qualcosa se MarcaModello è "MEI|CF8000EXEC"
+            pass
+
+        elif MarcaModello == "MEI|CF8000MDB":
+            # Fai qualcosa se MarcaModello è "MEI|CF8000MDB"
+            pass
+
+        elif MarcaModello == "MEI|CF690":
+            # Fai qualcosa se MarcaModello è "MEI|CF690"
+            pass
+
+        elif MarcaModello == "MEI|CF6000EXEC":
+            # Fai qualcosa se MarcaModello è "MEI|CF6000EXEC"
+            pass
+
+        elif MarcaModello == "MEI|EC6000MDB":
+            # Fai qualcosa se MarcaModello è "MEI|EC6000MDB"
+            pass
+
+        elif MarcaModello == "MEI|CF7900EXEC":
+            # Fai qualcosa se MarcaModello è "MEI|CF7900EXEC"
+            pass
+
+        elif MarcaModello == "MEI|CF7900MDB":
+            # Fai qualcosa se MarcaModello è "MEI|CF7900MDB"
+            pass
+
+        elif MarcaModello.startswith("COGES|"):
+             if state.DXS03.startswith("V0"):
+                cumulative_values = cumulative_values + cumulative_cogformulav0_values
+                pass
+             elif state.DXS03.startswith("V1"):
+                 cumulative_values = cumulative_values + cumulative_cogformulav1_values
+             elif state.DXS03.startswith("V2"):
+                 cumulative_values = cumulative_values + cumulative_cogformulav2_values
+
+        elif MarcaModello == "COGES|IDEA4COL":
+            # Fai qualcosa se MarcaModello è "COGES|IDEA4COL"
+            cumulative_values = cumulative_values + cumulative_cogformulav0_values
+            pass
+
+        elif MarcaModello == "PAYTEC|PAYTECV0":
+            # Fai qualcosa se MarcaModello è "PAYTEC|PAYTECV0"
+            pass
+        
+        elif MarcaModello == "PAYTEC|PAYTECV1":
+            # Fai qualcosa se MarcaModello è "PAYTEC|PAYTECV0"
+            pass
+
+        elif MarcaModello == "PAYTEC|PAYTECV2":
+            # Fai qualcosa se MarcaModello è "PAYTEC|PAYTECV0"
+            pass
+        
+        elif MarcaModello == "PAYTEC|PAYTECV3":
+            # Fai qualcosa se MarcaModello è "PAYTEC|PAYTECV0"
+            pass
+        
+        elif MarcaModello == "PAYTEC|PAYTECV4":
+            # Fai qualcosa se MarcaModello è "PAYTEC|PAYTECV0"
+            pass
+
+        elif MarcaModello == "SUZ0HAPP|CURRENZA":
+            # Fai qualcosa se MarcaModello è "SUZ0HAPP|CURRENZA"
+            pass
+
+        elif MarcaModello == "SUZ0HAPP|WORLDKEY":
+            # Fai qualcosa se MarcaModello è "SUZ0HAPP|WORLDKEY"
+            pass
+
+        elif MarcaModello == "SUZ0HAPP|EURO KEY NEXT":
+            # Fai qualcosa se MarcaModello è "SUZ0HAPP|EURO KEY NEXT"
+            pass
+
+        elif MarcaModello == "ELKEY|BUBBLE":
+            # Fai qualcosa se MarcaModello è "ELKEY|BUBBLE"
+            pass
+        elif MarcaModello.endswith("|XXX"):
+            # Fai qualcosa se MarcaModello termina con "|XXX"
+            pass
 
         cumulative_values = cumulative_values + cumulative_genericException_values
 
@@ -286,6 +454,8 @@ def lettura_tag(full_tag, initial_tag, part, i_max, j_max,state):
                     description = tag_descriptions.get(full_tag, "Nessuna descrizione disponibile")
                     tag_tree.insert("", tk.END, values=(full_tag, part, description), tags=('custom_tag',))
                     inserted_tags.add(full_tag)
+                    if full_tag == "DXS03":
+                        state.DXS03 = part
                     if full_tag == "ID101":
                         state.ID101 = part
                     if full_tag == "ID102":
@@ -294,6 +464,8 @@ def lettura_tag(full_tag, initial_tag, part, i_max, j_max,state):
                         state.ID705 = part
                     elif full_tag == "VA101":
                         state.VA101 = float(part)
+                    elif full_tag == "VA301":
+                        state.VA301 = float(part)
                     if full_tag == "ID101":
                         state.ID101 = part
                     elif full_tag == "EA301":
@@ -310,6 +482,8 @@ def lettura_tag(full_tag, initial_tag, part, i_max, j_max,state):
                     elif full_tag == "EA306":
                         if len(part) >= 4:
                             state.EA306 = convertTagToTime(part)
+                    elif full_tag == "MA502":
+                        state.MA502 = part
                     elif full_tag == "CA101":
                         state.CA101 = part
                     elif full_tag == "CA102":
@@ -333,11 +507,15 @@ def lettura_tag(full_tag, initial_tag, part, i_max, j_max,state):
                     elif full_tag == "CA305":
                         state.CA305 = float(part)
                     elif full_tag == "DA102":
-                        state.DA102 = float(part)
+                        state.DA102 = part
                     elif full_tag == "DA401":
                         state.DA401 = float(part)
+                    elif full_tag == "DA601":
+                        state.DA601 = float(part)
                     elif full_tag == "DB401":
                         state.DB401 = float(part)
+                    elif full_tag == "DB601":
+                        state.DB601 = float(part)
                     elif full_tag == "CA1002":
                         state.CA1002 = float(part)
                     elif full_tag == "CA307":
