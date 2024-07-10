@@ -15,8 +15,20 @@ TotaleCaricatoManualeTubiResto = CA1002                 ✅
 
 NOTA BENE: VA101 indica i valori CUMULATI della MACCHINA
 
+FORULE UGUALI TRA LE GETTONIERE:
+Venduto = VA101 + VA301 [COGES v0,v1,v3,v4]
+Venduto = VA101         [MHD,ELK, COGES v2]
+
+VendutoContante = CA201                 [NUOVA FORMULA,ELK,COGES v0,v1,v2,v3,v4]
+VendutoContante = CA201 - CA702 + CA706 [MEI,NRI,MHD]
+
+VendutoNoContante = DA201 + DB201 - DA503 - DB503 + TA201 + TA205 + DA507 + DB507 [MEI,MHD]
+VendutoNoContante = VA101 + CA201 [COGES v0,v1,v2,v3,v4]
+
+Incassato = CA305 [NUOVA FORMULA,MEI,NRI,ELK, COGES v0,v1,v2,v4]
+
 valori CUMULATO della gettoniera |NUOVA FORMULA|
-Venduto                        = VA101-DA503-DB503-CA702
+Venduto                        = VA101 - DA503 - DB503 - CA702
 VendutoContante                = CA201 ☑️
 VendutoNoContante              = DA201 
 Incassato                      = CA305 ☑️

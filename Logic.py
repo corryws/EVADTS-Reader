@@ -3,7 +3,7 @@ from tkinter import filedialog, ttk, messagebox
 import re
 import os
 from variable_tag import GlobalState
-from function import convert_to_decimal,valida_scelta_campo,mostra_info_sviluppatore,convertTagToData,convertTagToTime
+from function import mostra_info_sviluppatore, convertTagToData,convertTagToTime
 
 # Importa il dizionario tag_descriptions dal modulo tag.py
 from tag import tag_descriptions
@@ -255,7 +255,6 @@ def show_info_vending_machine_tag(state):
         if MarcaModello.startswith("COGES|"):
              if state.DXS03.startswith("V0"):
                 cumulative_values = cumulative_values + state.returnCogformulav0List()
-                pass
              elif state.DXS03.startswith("V1"):
                  cumulative_values = cumulative_values + state.returnCogformulav1List()
              elif state.DXS03.startswith("V2"):
