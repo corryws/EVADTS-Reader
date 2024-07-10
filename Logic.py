@@ -201,6 +201,7 @@ def show_info_vending_machine_tag(state):
         state.CA307  = float(state.CA307)
         state.CA403  = float(state.CA403)
         state.CA404  = float(state.CA404)
+        state.CA802  = float(state.CA802)
         state.DA503  = float(state.DA503)
         state.DB503  = float(state.DB503)
         state.CA702  = float(state.CA702)
@@ -245,189 +246,49 @@ def show_info_vending_machine_tag(state):
             ("___________________________________________________________________",""),
         ]
 
-        cumulative_newformula_values = [
-            ("VALORI CUMULATI DELLA MACCHINA - NUOVA FORMULA",""),
-            ("Venduto", f"{convert_to_decimal(state.VA101 - state.DA503 - state.DB503 - state.CA702)}€"),
-            ("VendutoContante", f"{convert_to_decimal(state.CA201)}€"),
-            ("VendutoNoContante", f"{convert_to_decimal(state.DA201)}€"),
-            ("Incassato", f"{convert_to_decimal(state.CA305)}€"),
-            ("IncassatoRicarica", f"{convert_to_decimal(state.DA401 + state.DB401)}€"),
-            ("IncassatoVendita", f"{convert_to_decimal(state.CA305 - (state.DA401 + state.DB401) - state.CA1002)}€"),
-            ("___________________________________________________________________",""),
-        ]
-
-        cumulative_meiformula_values = [
-            ("VALORI CUMULATI DELLA MACCHINA - FORMULA MEI | CPI - GENERICO",""),
-            ("Venduto", f"{convert_to_decimal( (state.VA101-state.DA503-state.DB503-state.CA702) + (state.CA706+state.DA507+state.DB507) )}€"),
-            ("VendutoContante", f"{convert_to_decimal( (state.CA201-state.CA702) + state.CA706 )}€"),
-            ("VendutoNoContante", f"{convert_to_decimal( (state.DA201+state.DB201) - (state.DA503+state.TA201+state.TA205+state.DA507+state.DB507) )}€"),
-            ("Incassato   ", f"{convert_to_decimal(state.CA305)}€"),
-            ("IncassatoRicarica", f"{convert_to_decimal(valida_scelta_campo(state.DA201,state.DA301,'>',0) + valida_scelta_campo(state.DB201,state.DB301,'>',0) + state.DA401 + state.DB401 - (state.DA301 - state.DB301 - state.DB505 - state.DA505))}€"),
-            ("IncassatoVendita   ", f"{convert_to_decimal(state.CA305 - state.CA1002 - state.DA401 - state.DB401)}€"),
-            ("___________________________________________________________________",""),
-        ]
-
-        cumulative_nriformula_values = [
-            ("VALORI CUMULATI DELLA MACCHINA - FORMULA MEI | CPI - GENERICO",""),
-            ("Venduto", f"{convert_to_decimal( (state.VA101-state.DA503-state.DB503-state.CA702) + (state.CA706+state.DA507+state.DB507) )}€"),
-            ("VendutoContante", f"{convert_to_decimal( (state.CA201-state.CA702) + state.CA706 )}€"),
-            ("VendutoNoContante", f"{convert_to_decimal( (state.DA201+state.DB201) - (state.DA503+state.TA201+state.TA205+state.DA507+state.DB507) )}€"),
-            ("Incassato   ", f"{convert_to_decimal(state.CA305)}€"),
-            ("IncassatoRicarica", f"{convert_to_decimal(valida_scelta_campo(state.DA201,state.DA301,'>',0) + valida_scelta_campo(state.DB201,state.DB301,'>',0) + state.DA401 + state.DB401 - (state.DA301 - state.DB301 - state.DB505 - state.DA505))}€"),
-            ("IncassatoVendita   ", f"{convert_to_decimal(state.CA305 - state.CA1002 - state.DA401 - state.DB401)}€"),
-            ("___________________________________________________________________",""),
-        ]
-
-
-        """ valori CUMULATO della gettoniera NRI | SUZ0HAPP
-        Venduto                        = VA101 - DA503 - DB503
-        VendutoContante                = CA201 - CA702 + CA706 ☑️
-        VendutoNoContante              = DA201 + DB201 - DA503 - DB503 + TA201 + TA205
-        Incassato                      = CA305 ☑️
-        IncassatoRicarica              = DA201(DA301|>|0|) + DB201(DB301|>|0|) + DA401 + DB401 - DA301 - DB301 - DA503 - DB503 - DA601 - DB601
-        IncassatoVendita               = CA305 - CA1002 - DA401 - DB401 ☑️ """
-        
-        cumulative_mhdformula_values = [
-            ("VALORI CUMULATI DELLA MACCHINA - FORMULA MHD | MICROHARD",""),
-            ("Venduto", f"{convert_to_decimal(state.VA101)}€"),
-            ("VendutoContante", f"{convert_to_decimal( (state.CA201-state.CA702) + state.CA706 )}€"),
-            ("VendutoNoContante", f"{convert_to_decimal( (state.DA201+state.DB201) - (state.DA503+state.TA201+state.TA205+state.DA507+state.DB507) )}€"),
-            ("Incassato   ", f"{convert_to_decimal(state.CA305 + state.DA301 + state.DB301)}€"),
-            ("IncassatoRicarica   ", f"{convert_to_decimal(state.DA401 + state.DB401)}€"),
-            ("IncassatoVendita   ", f"{convert_to_decimal(state.CA305 - state.CA1002 - state.DA401 - state.DB401)}€"),
-            ("___________________________________________________________________",""),
-        ]
-
-        cumulative_cogformulav0_values = [
-            ("VALORI CUMULATI DELLA MACCHINA - FORMULA COG | COGES V0",""),
-            ("Venduto", f"{convert_to_decimal(state.VA101 + state.VA301)}€"),
-            ("VendutoContante", f"{convert_to_decimal( (state.CA201))}€"),
-            ("VendutoNoContante", f"{convert_to_decimal( state.VA101 + state.CA201)}€"),
-            ("Incassato   ", f"{convert_to_decimal(state.CA305)}€"),
-            ("IncassatoRicarica   ", f"{convert_to_decimal((state.DA401 + state.DA601) - (state.DB401 - state.DB601))}€"),
-            ("IncassatoVendita   ", f"{convert_to_decimal((state.CA305 - state.CA1002 - state.DA401) + (state.DA601) - state.DB401 + (state.DB601))}€"),
-            ("___________________________________________________________________",""),
-        ]
-
-        cumulative_cogformulav1_values = [
-            ("VALORI CUMULATI DELLA MACCHINA - FORMULA COG | COGES V1",""),
-            ("Venduto", f"{convert_to_decimal(state.VA101 + state.VA301)}€"),
-            ("VendutoContante", f"{convert_to_decimal( (state.CA201))}€"),
-            ("VendutoNoContante", f"{convert_to_decimal( state.VA101 + state.CA201)}€"),
-            ("Incassato   ", f"{convert_to_decimal(state.CA305)}€"),
-            ("IncassatoRicarica   ", f"{convert_to_decimal((state.DA401 + state.DA601))}€"),
-            ("IncassatoVendita   ", f"{convert_to_decimal((state.CA305 - state.CA1002 - state.DA401) + (state.DA601))}€"),
-            ("___________________________________________________________________",""),
-        ]
-        
-        cumulative_cogformulav2_values = [
-            ("VALORI CUMULATI DELLA MACCHINA - FORMULA COG | COGES V2",""),
-            ("Venduto", f"{convert_to_decimal(state.VA101)}€"),
-            ("VendutoContante", f"{convert_to_decimal( (state.CA201))}€"),
-            ("VendutoNoContante", f"{convert_to_decimal( state.VA101 + state.CA201)}€"),
-            ("Incassato   ", f"{convert_to_decimal(state.CA305)}€"),
-            ("IncassatoRicarica   ", f"{convert_to_decimal((state.DA401))}€"),
-            ("IncassatoVendita   ", f"{convert_to_decimal((state.CA305 - state.DA401) + (state.DA601))}€"),
-            ("___________________________________________________________________",""),
-        ]
-        
-        cumulative_genericException_values = [
-            ("VALORI CUMULATI DELLA MACCHINA IDENTICI PER TUTTE LE ECCEZIONI",""),
-            ("TotaleResoTubiResto    ", f"{convert_to_decimal(state.DA503+state.DB503)}€"),
-            ("TotalePrelevatoTubiResto   ", f"{convert_to_decimal(state.CA702)}€"),
-            ("TotaleCaricatoTubiResto   ", f"{convert_to_decimal(state.CA706+state.DA507+state.DB507)}€"),
-            ("TotaleIncassatoMeccanico   ", f"{convert_to_decimal(state.DA301+state.DB301)}€"),
-            ("TotaleIncassatoBillValidator   ", f"{convert_to_decimal(state.DA505+state.DB505)}€")
-        ]
-
-        cumulative_values = cumulative_info_values + cumulative_newformula_values + cumulative_meiformula_values
+        cumulative_values = cumulative_info_values + state.returnNewFormulaList() + state.returnMeiFormulaList()
 
         """ aggiungere qui le somme in base al modello della gettoniera uscito """
         #Controllo Marca Modello
         # Aggiunta di controlli per tutte le variazioni di MarcaModello
 
-        if MarcaModello == "MEI|CF8000EXEC":
-            # Fai qualcosa se MarcaModello è "MEI|CF8000EXEC"
-            pass
-
-        elif MarcaModello == "MEI|CF8000MDB":
-            # Fai qualcosa se MarcaModello è "MEI|CF8000MDB"
-            pass
-
-        elif MarcaModello == "MEI|CF690":
-            # Fai qualcosa se MarcaModello è "MEI|CF690"
-            pass
-
-        elif MarcaModello == "MEI|CF6000EXEC":
-            # Fai qualcosa se MarcaModello è "MEI|CF6000EXEC"
-            pass
-
-        elif MarcaModello == "MEI|EC6000MDB":
-            # Fai qualcosa se MarcaModello è "MEI|EC6000MDB"
-            pass
-
-        elif MarcaModello == "MEI|CF7900EXEC":
-            # Fai qualcosa se MarcaModello è "MEI|CF7900EXEC"
-            pass
-
-        elif MarcaModello == "MEI|CF7900MDB":
-            # Fai qualcosa se MarcaModello è "MEI|CF7900MDB"
-            pass
-
-        elif MarcaModello.startswith("COGES|"):
+        if MarcaModello.startswith("COGES|"):
              if state.DXS03.startswith("V0"):
-                cumulative_values = cumulative_values + cumulative_cogformulav0_values
+                cumulative_values = cumulative_values + state.returnCogformulav0List()
                 pass
              elif state.DXS03.startswith("V1"):
-                 cumulative_values = cumulative_values + cumulative_cogformulav1_values
+                 cumulative_values = cumulative_values + state.returnCogformulav1List()
              elif state.DXS03.startswith("V2"):
-                 cumulative_values = cumulative_values + cumulative_cogformulav2_values
+                 cumulative_values = cumulative_values + state.returnCogformulav2List()
+             elif state.DXS03.startswith("V3"):
+                 cumulative_values = cumulative_values + state.returnCogformulav3List()
+             elif state.DXS03.startswith("V4"):
+                 cumulative_values = cumulative_values + state.returnCogformulav4List()
 
-        elif MarcaModello == "COGES|IDEA4COL":
-            # Fai qualcosa se MarcaModello è "COGES|IDEA4COL"
-            cumulative_values = cumulative_values + cumulative_cogformulav0_values
-            pass
-
-        elif MarcaModello == "PAYTEC|PAYTECV0":
-            # Fai qualcosa se MarcaModello è "PAYTEC|PAYTECV0"
-            pass
-        
-        elif MarcaModello == "PAYTEC|PAYTECV1":
-            # Fai qualcosa se MarcaModello è "PAYTEC|PAYTECV0"
-            pass
-
-        elif MarcaModello == "PAYTEC|PAYTECV2":
-            # Fai qualcosa se MarcaModello è "PAYTEC|PAYTECV0"
-            pass
-        
-        elif MarcaModello == "PAYTEC|PAYTECV3":
-            # Fai qualcosa se MarcaModello è "PAYTEC|PAYTECV0"
-            pass
-        
-        elif MarcaModello == "PAYTEC|PAYTECV4":
-            # Fai qualcosa se MarcaModello è "PAYTEC|PAYTECV0"
+        elif id_gettoniera.startswith("FAG"):
+            if MarcaModello.startswith("PAYTEC|PAYTECV0"):
+                pass
+            elif MarcaModello.startswith("PAYTEC|PAYTECV1"):
+                pass
+            elif MarcaModello.startswith("PAYTEC|PAYTECV2"):
+                pass
+            elif MarcaModello.startswith("PAYTEC|PAYTECV3"):
+                pass
+            elif MarcaModello.startswith("PAYTEC|PAYTECV4"):
+                pass
             pass
 
-        elif MarcaModello == "SUZ0HAPP|CURRENZA":
+        elif MarcaModello.startswith("SUZ0HAPP|"):
             # Fai qualcosa se MarcaModello è "SUZ0HAPP|CURRENZA"
-            pass
-
-        elif MarcaModello == "SUZ0HAPP|WORLDKEY":
-            # Fai qualcosa se MarcaModello è "SUZ0HAPP|WORLDKEY"
-            pass
-
-        elif MarcaModello == "SUZ0HAPP|EURO KEY NEXT":
-            # Fai qualcosa se MarcaModello è "SUZ0HAPP|EURO KEY NEXT"
+            cumulative_values = cumulative_values + state.returnNriformulaList()
             pass
 
         elif MarcaModello == "ELKEY|BUBBLE":
             # Fai qualcosa se MarcaModello è "ELKEY|BUBBLE"
-            pass
-        elif MarcaModello.endswith("|XXX"):
-            # Fai qualcosa se MarcaModello termina con "|XXX"
+            cumulative_values = cumulative_values + state.returnElkformulaList()
             pass
 
-        cumulative_values = cumulative_values + cumulative_genericException_values
+        cumulative_values = cumulative_values + state.returnGenericExceptionList()
 
         # Pulizia del widget tk.Text
         info_text.config(state=tk.NORMAL)
@@ -488,6 +349,8 @@ def lettura_tag(full_tag, initial_tag, part, i_max, j_max,state):
                         state.CA101 = part
                     elif full_tag == "CA102":
                         state.CA102 = part
+                    elif full_tag == "CA802":
+                        state.CA802 = part  
                     elif full_tag == "DA503":
                         state.DA503 = float(part)
                     elif full_tag == "DB503":

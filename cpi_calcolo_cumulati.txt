@@ -23,9 +23,11 @@ Incassato                      = CA305 ☑️
 IncassatoRicarica              = DA401 + DB401 ☑️
 IncassatoVendita               = CA305 - CA1002 - DA401 + DB401 ☑️
 
+-----------------------------------------------------------------------------
+
 valori CUMULATO della gettoniera ->  MEI | CPI
-Venduto                        = VA101-DA503-DB503-CA702+CA706+DA507+DB507
-VendutoContante                = CA201-CA702+CA706 ☑️
+Venduto                        = VA101 - DA503 - DB503 - CA702 + CA706 + DA507 + DB507
+VendutoContante                = CA201 - CA702 + CA706 ☑️
 VendutoNoContante              = DA201 + DB201 - DA503 - DB503 + TA201 + TA205 + DA507 + DB507 ☑️
 Incassato                      = CA305 ☑️
 IncassatoRicarica              = DA201(DA301|>|0|) + DB201(DB301|>|0|) + DA401 + DB401 - DA301 - DB301 - DB505 - DA505
@@ -48,12 +50,27 @@ Incassato                      = CA305 + DA301 + DB301
 IncassatoRicarica              = DA401 + DB401 ☑️
 IncassatoVendita               = CA305 - CA1002 - DA401 - DB401 ☑️
 
+
+ECCEZIONE ELK | ELKEY BUBBLE-----------------------------------------------------------------------------
+valori CUMULATO della gettoniera ELK | ELKEY BUBBLE
+Venduto                        = VA101 ☑️
+VendutoContante                = CA201 ☑️
+VendutoNoContante              = DA201 + DB201 ☑️
+Incassato                      = CA305 ☑️
+IncassatoRicarica              = CA305 - CA201 - CA403 + CA404 - CA802 
+IncassatoVendita               = CA201 + CA403 - CA404 + CA802 
+
+ECCEZIONI FAG-----------------------------------------------------------------------------
+valori CUMULATO della gettoniera FAG | PAYTECV0
+
+
+ECCEZIONI COGES-----------------------------------------------------------------------------
 valori CUMULATO della gettoniera COG | COGES V0
 Venduto                        = VA101 + VA301 ☑️
 VendutoContante                = CA201☑️
 VendutoNoContante              = VA101 + CA201 ☑️
 Incassato                      = CA305 ☑️
-IncassatoRicarica              = DA401 + DA601 - DB401 - DB601 
+IncassatoRicarica              = DA401 - DA601 + DB401 - DB601 
 IncassatoVendita               = CA305 - CA1002 - DA401 + DA601 - DB401 + DB601
 
 valori CUMULATO della gettoniera COG | COGES V1
@@ -61,7 +78,7 @@ Venduto                        = VA101 + VA301 ☑️
 VendutoContante                = CA201 ☑️
 VendutoNoContante              = VA101 + CA201 ☑️
 Incassato                      = CA305 ☑️
-IncassatoRicarica              = DA401 + DA601 ☑️
+IncassatoRicarica              = DA401 - DA601 ☑️
 IncassatoVendita               = CA305 - CA1002 - DA401 + DA601 ☑️
 
 valori CUMULATO della gettoniera COG | COGES V2
@@ -70,8 +87,23 @@ VendutoContante                = CA201 ☑️
 VendutoNoContante              = VA101 + CA201 ☑️
 Incassato                      = CA305 ☑️
 IncassatoRicarica              = DA401
-IncassatoVendita               = CA305 - DA401 + DA601
+IncassatoVendita               = CA305 - DA401 + DA601 ☑️
 
+valori CUMULATO della gettoniera COG | COGES V3
+Venduto                        = VA101 + VA301 ☑️
+VendutoContante                = CA201 ☑️
+VendutoNoContante              = VA101 + CA201  ☑️
+Incassato                      = CA305 + CA1002 ☑️
+IncassatoRicarica              = DA401 - DA601  ☑️
+IncassatoVendita               = CA305 - DA401 + DA601 ☑️
+
+valori CUMULATO della gettoniera COG | COGES V4
+Venduto                        = VA101 + VA301 ☑️
+VendutoContante                = CA201 ☑️
+VendutoNoContante              = VA101 + CA201  ☑️
+Incassato                      = CA305 ☑️
+IncassatoRicarica              = DA401 - DA601  ☑️
+IncassatoVendita               = CA305 - DA401 + DA601 ☑️
 
 SPIEGAZIONE LOGICA
 es. EA204(EA201|=|VALORE|)
