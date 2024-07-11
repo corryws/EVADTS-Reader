@@ -1,0 +1,99 @@
+
+""" def lettura_tag(full_tag, initial_tag, part, i_max, j_max,state):
+
+    for i in range(1, i_max + 1):
+        if j_max > 0:
+            for j in range(1, j_max + 1):
+                if full_tag not in inserted_tags:
+                    description = tag_descriptions.get(full_tag, "Nessuna descrizione disponibile")
+                    tag_tree.insert("", tk.END, values=(full_tag, part, description), tags=('custom_tag',))
+                    inserted_tags.add(full_tag)
+                    if full_tag == "DXS03":
+                        state.DXS03 = part
+                    if full_tag == "ID101":
+                        state.ID101 = part
+                    if full_tag == "ID102":
+                        state.ID102 = part
+                    if full_tag == "ID705":
+                        state.ID705 = part
+                    elif full_tag == "VA101":
+                        state.VA101 = float(part)
+                    elif full_tag == "VA301":
+                        state.VA301 = float(part)
+                    if full_tag == "ID101":
+                        state.ID101 = part
+                    elif full_tag == "EA301":
+                        state.EA301 = part
+                    elif full_tag == "EA302":
+                        if len(part) >= 6:
+                            state.EA302 = convertTagToData(part)
+                    elif full_tag == "EA303":
+                        if len(part) >= 4:
+                            state.EA303 = convertTagToTime(part)
+                    elif full_tag == "EA305":
+                        if len(part) >= 6:
+                            state.EA305 = convertTagToData(part)
+                    elif full_tag == "EA306":
+                        if len(part) >= 4:
+                            state.EA306 = convertTagToTime(part)
+                    elif full_tag == "MA502":
+                        state.MA502 = part
+                    elif full_tag == "CA101":
+                        state.CA101 = part
+                    elif full_tag == "CA102":
+                        state.CA102 = part
+                    elif full_tag == "CA802":
+                        state.CA802 = part  
+                    elif full_tag == "DA503":
+                        state.DA503 = float(part)
+                    elif full_tag == "DB503":
+                        state.DB503 = float(part)
+                    elif full_tag == "CA702":
+                        state.CA702 = float(part)
+                    elif full_tag == "CA706":
+                        state.CA706 = float(part)
+                    elif full_tag == "DA507":
+                        state.DA507 = float(part)
+                    elif full_tag == "DB507":
+                        state.DB507 = float(part)
+                    elif full_tag == "DA201":
+                        state.DA201 = float(part)
+                    elif full_tag == "DB201":
+                        state.DB201 = float(part)
+                    elif full_tag == "CA305":
+                        state.CA305 = float(part)
+                    elif full_tag == "DA102":
+                        state.DA102 = part
+                    elif full_tag == "DA401":
+                        state.DA401 = float(part)
+                    elif full_tag == "DA601":
+                        state.DA601 = float(part)
+                    elif full_tag == "DB401":
+                        state.DB401 = float(part)
+                    elif full_tag == "DB601":
+                        state.DB601 = float(part)
+                    elif full_tag == "CA1002":
+                        state.CA1002 = float(part)
+                    elif full_tag == "CA307":
+                        state.CA307 = float(part)
+                    elif full_tag == "CA403":
+                        state.CA403 = float(part)
+                    elif full_tag == "CA404":
+                        state.CA404 = float(part)
+                    elif full_tag == "TA201":
+                        state.TA201 = float(part)
+                    elif full_tag == "TA205":
+                        state.TA205 = float(part)
+                    elif full_tag == "DA301":
+                        state.DA301 = float(part)
+                    elif full_tag == "DB301":
+                        state.DB301 = float(part)
+                    elif full_tag == "DB505":
+                        state.DB505 = float(part)
+                    elif full_tag == "DA505":
+                        state.DA505 = float(part)
+                else:
+                    if full_tag not in inserted_tags:
+                        description = tag_descriptions.get(full_tag, "Nessuna descrizione disponibile")
+                        tag_tree.insert("", tk.END, values=(full_tag, part, description), tags=('custom_tag',))
+                        inserted_tags.add(full_tag) """

@@ -16,59 +16,65 @@ TotaleCaricatoManualeTubiResto = CA1002                 ✅
 NOTA BENE: VA101 indica i valori CUMULATI della MACCHINA
 
 FORULE UGUALI TRA LE GETTONIERE:
-Venduto = VA101 + VA301 [COGES v0,v1,v3,v4]
-Venduto = VA101         [MHD,ELK, COGES v2]
+Venduto = VA101 + VA301                                                           [COGES v0,v1,v3,v4] ▶️
+Venduto = VA101                                                                   [MHD,ELK, COGES v2] ⏸
 
-VendutoContante = CA201                 [NUOVA FORMULA,ELK,COGES v0,v1,v2,v3,v4]
-VendutoContante = CA201 - CA702 + CA706 [MEI,NRI,MHD]
+VendutoContante   = CA201                                                         [NUOVA FORMULA,ELK,COGES v0,v1,v2,v3,v4] 🈯️
+VendutoContante   = CA201 - CA702 + CA706                                         [MEI,NRI,MHD] 🈶
 
-VendutoNoContante = DA201 + DB201 - DA503 - DB503 + TA201 + TA205 + DA507 + DB507 [MEI,MHD]
-VendutoNoContante = VA101 + CA201 [COGES v0,v1,v2,v3,v4]
+VendutoNoContante = DA201 + DB201 - DA503 - DB503 + TA201 + TA205 + DA507 + DB507 [MEI,MHD] ☮️
+VendutoNoContante = VA101 + CA201                                                 [COGES v0,v1,v2,v3,v4] ☢️
 
-Incassato = CA305 [NUOVA FORMULA,MEI,NRI,ELK, COGES v0,v1,v2,v4]
+Incassato         = CA305                                                         [NUOVA FORMULA,MEI,NRI,ELK, COGES v0,v1,v2,v4] 🌀
+
+IncassatoRicarica = DA401 + DB401                                                 [NUOVA FORMULA,MHD] ♻️
+IncassatoRicarica = DA401 - DA601                                                 [COGES v1,v3,v4] ♨️
+
+IncassatoVendita = CA305 - CA1002 - DA401 - DB401                                 [NUOVA FORMULA,MEI,NRI,MHD] ⛔️
+IncassatoVendita = CA305 - DA401 + DA601                                          [COGES v2,v3,v4] 🔳
 
 valori CUMULATO della gettoniera |NUOVA FORMULA|
 Venduto                        = VA101 - DA503 - DB503 - CA702
-VendutoContante                = CA201 ☑️
+VendutoContante                = CA201 🈯️
 VendutoNoContante              = DA201 
-Incassato                      = CA305 ☑️
-IncassatoRicarica              = DA401 + DB401 ☑️
-IncassatoVendita               = CA305 - CA1002 - DA401 + DB401 ☑️
+Incassato                      = CA305 🌀
+IncassatoRicarica              = DA401 + DB401 ♻️
+IncassatoVendita               = CA305 - CA1002 - DA401 - DB401 ⛔️
 
 -----------------------------------------------------------------------------
 
 valori CUMULATO della gettoniera ->  MEI | CPI
 Venduto                        = VA101 - DA503 - DB503 - CA702 + CA706 + DA507 + DB507
-VendutoContante                = CA201 - CA702 + CA706 ☑️
-VendutoNoContante              = DA201 + DB201 - DA503 - DB503 + TA201 + TA205 + DA507 + DB507 ☑️
-Incassato                      = CA305 ☑️
+VendutoContante                = CA201 - CA702 + CA706 🈶
+VendutoNoContante              = DA201 + DB201 - DA503 - DB503 + TA201 + TA205 + DA507 + DB507  ☮️
+Incassato                      = CA305 🌀
 IncassatoRicarica              = DA201(DA301|>|0|) + DB201(DB301|>|0|) + DA401 + DB401 - DA301 - DB301 - DB505 - DA505
-IncassatoVendita               = CA305 - CA1002 - DA401 - DB401 ☑️
+IncassatoVendita               = CA305 - CA1002 - DA401 - DB401 ⛔️
 
 valori CUMULATO della gettoniera NRI | SUZ0HAPP
 Venduto                        = VA101 - DA503 - DB503
-VendutoContante                = CA201 - CA702 + CA706 ☑️
+VendutoContante                = CA201 - CA702 + CA706 🈶
 VendutoNoContante              = DA201 + DB201 - DA503 - DB503 + TA201 + TA205
-Incassato                      = CA305 ☑️
+Incassato                      = CA305 🌀
 IncassatoRicarica              = DA201(DA301|>|0|) + DB201(DB301|>|0|) + DA401 + DB401 - DA301 - DB301 - DA503 - DB503 - DA601 - DB601
-IncassatoVendita               = CA305 - CA1002 - DA401 - DB401 ☑️
+IncassatoVendita               = CA305 - CA1002 - DA401 - DB401 ⛔️
 
 
 valori CUMULATO della gettoniera MHD | MICROHARD
-Venduto                        = VA101 ☑️
-VendutoContante                = CA201 - CA702 + CA706 ☑️
-VendutoNoContante              = DA201 + DB201 - DA503 - DB503 + TA201 + TA205 + DA507 + DB507 ☑️
+Venduto                        = VA101 ⏸ 
+VendutoContante                = CA201 - CA702 + CA706 🈶
+VendutoNoContante              = DA201 + DB201 - DA503 - DB503 + TA201 + TA205 + DA507 + DB507 ☮️
 Incassato                      = CA305 + DA301 + DB301
-IncassatoRicarica              = DA401 + DB401 ☑️
-IncassatoVendita               = CA305 - CA1002 - DA401 - DB401 ☑️
+IncassatoRicarica              = DA401 + DB401 ♻️
+IncassatoVendita               = CA305 - CA1002 - DA401 - DB401 ⛔️
 
 
 ECCEZIONE ELK | ELKEY BUBBLE-----------------------------------------------------------------------------
 valori CUMULATO della gettoniera ELK | ELKEY BUBBLE
-Venduto                        = VA101 ☑️
-VendutoContante                = CA201 ☑️
-VendutoNoContante              = DA201 + DB201 ☑️
-Incassato                      = CA305 ☑️
+Venduto                        = VA101 ⏸
+VendutoContante                = CA201 🈯️
+VendutoNoContante              = DA201 + DB201 
+Incassato                      = CA305 🌀
 IncassatoRicarica              = CA305 - CA201 - CA403 + CA404 - CA802 
 IncassatoVendita               = CA201 + CA403 - CA404 + CA802 
 
@@ -78,44 +84,44 @@ valori CUMULATO della gettoniera FAG | PAYTECV0
 
 ECCEZIONI COGES-----------------------------------------------------------------------------
 valori CUMULATO della gettoniera COG | COGES V0
-Venduto                        = VA101 + VA301 ☑️
-VendutoContante                = CA201☑️
-VendutoNoContante              = VA101 + CA201 ☑️
-Incassato                      = CA305 ☑️
+Venduto                        = VA101 + VA301 ▶️ 
+VendutoContante                = CA201 🈯️
+VendutoNoContante              = VA101 + CA201 ☢️
+Incassato                      = CA305 🌀
 IncassatoRicarica              = DA401 - DA601 + DB401 - DB601 
 IncassatoVendita               = CA305 - CA1002 - DA401 + DA601 - DB401 + DB601
 
 valori CUMULATO della gettoniera COG | COGES V1
-Venduto                        = VA101 + VA301 ☑️
-VendutoContante                = CA201 ☑️
-VendutoNoContante              = VA101 + CA201 ☑️
-Incassato                      = CA305 ☑️
-IncassatoRicarica              = DA401 - DA601 ☑️
-IncassatoVendita               = CA305 - CA1002 - DA401 + DA601 ☑️
+Venduto                        = VA101 + VA301  ▶️
+VendutoContante                = CA201 🈯️
+VendutoNoContante              = VA101 + CA201 ☢️
+Incassato                      = CA305 🌀
+IncassatoRicarica              = DA401 - DA601 ♨️
+IncassatoVendita               = CA305 - CA1002 - DA401 + DA601 
 
 valori CUMULATO della gettoniera COG | COGES V2
-Venduto                        = VA101 ☑️
-VendutoContante                = CA201 ☑️
-VendutoNoContante              = VA101 + CA201 ☑️
-Incassato                      = CA305 ☑️
+Venduto                        = VA101 ⏸
+VendutoContante                = CA201 🈯️ 
+VendutoNoContante              = VA101 + CA201 ☢️
+Incassato                      = CA305 🌀
 IncassatoRicarica              = DA401
-IncassatoVendita               = CA305 - DA401 + DA601 ☑️
+IncassatoVendita               = CA305 - DA401 + DA601 🔳
 
 valori CUMULATO della gettoniera COG | COGES V3
-Venduto                        = VA101 + VA301 ☑️
-VendutoContante                = CA201 ☑️
-VendutoNoContante              = VA101 + CA201  ☑️
-Incassato                      = CA305 + CA1002 ☑️
-IncassatoRicarica              = DA401 - DA601  ☑️
-IncassatoVendita               = CA305 - DA401 + DA601 ☑️
+Venduto                        = VA101 + VA301 ▶️
+VendutoContante                = CA201 🈯️
+VendutoNoContante              = VA101 + CA201 ☢️
+Incassato                      = CA305 + CA1002 
+IncassatoRicarica              = DA401 - DA601 ♨️
+IncassatoVendita               = CA305 - DA401 + DA601 🔳
 
 valori CUMULATO della gettoniera COG | COGES V4
-Venduto                        = VA101 + VA301 ☑️
-VendutoContante                = CA201 ☑️
-VendutoNoContante              = VA101 + CA201  ☑️
-Incassato                      = CA305 ☑️
-IncassatoRicarica              = DA401 - DA601  ☑️
-IncassatoVendita               = CA305 - DA401 + DA601 ☑️
+Venduto                        = VA101 + VA301 ▶️
+VendutoContante                = CA201 🈯️
+VendutoNoContante              = VA101 + CA201 ☢️
+Incassato                      = CA305 🌀
+IncassatoRicarica              = DA401 - DA601 ♨️
+IncassatoVendita               = CA305 - DA401 + DA601 🔳
 
 SPIEGAZIONE LOGICA
 es. EA204(EA201|=|VALORE|)

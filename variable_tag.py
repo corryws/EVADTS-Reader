@@ -3,12 +3,12 @@ from function import convert_to_decimal, valida_scelta_campo
 
 class GlobalState:
     def __init__(self):
-        self.ID101 = self.CA101 = self.EA302 = self.EA303 = self.EA305 = self.EA306 = self.EA301 = self.ID102 = self.ID705 = self.DA102 = self.MA502 = self.DXS03 = ""
-        self.VA101 = self.VA301 = self.CA201 = self.DA201 = self.DA601 = self.DB601 = self.CA305 = self.DA401 = self.DB401 = self.CA1002 = self.CA307 = self.CA403 = self.CA404 = self.CA102 = self.CA802 = 0
+        self.ID101 = self.CA101 = self.EA302 = self.EA303 = self.EA305 = self.EA306 = self.EA301 = self.ID102 = self.ID705 = self.DA102 = self.MA502 = self.DXS03 = self.CA102 = self.DXS01 = ""
+        self.VA101 = self.VA301 = self.CA201 = self.DA201 = self.DA601 = self.DB601 = self.CA305 = self.DA401 = self.DB401 = self.CA1002 = self.CA307 = self.CA403 = self.CA404 = self.CA802 = 0
         self.DA503 = self.DB503 = self.CA702 = self.CA706 = self.DA507 = self.DB507 = self.DB201 = self.TA201 = self.TA205 = self.DA301 = self.DB301 = self.DB505 = self.DA505 = 0
 
     def azzera(self):
-        self.ID101 = self.CA101 = self.EA302 = self.EA303 = self.EA305 = self.EA306 = self.EA301 = self.ID102 = self.ID705 = self.DA102 = self.MA502 = self.DXS03 = ""
+        self.ID101 = self.CA101 = self.EA302 = self.EA303 = self.EA305 = self.EA306 = self.EA301 = self.ID102 = self.ID705 = self.DA102 = self.MA502 = self.DXS03 = self.CA102 = self.DXS01 = ""
         self.VA101 = self.VA301 = self.CA201 = self.DA201 = self.DA601 = self.DB601 = self.CA305 = self.DA401 = self.DB401 = self.CA1002 = self.CA307 = self.CA403 = self.CA404 = self.CA802 = 0
         self.DA503 = self.DB503 = self.CA702 = self.CA706 = self.DA507 = self.DB507 = self.DB201 = self.TA201 = self.TA205 = self.DA301 = self.DB301 = self.DB505 = self.DA505 = 0
 
@@ -27,7 +27,7 @@ class GlobalState:
             ("VendutoNoContante", "DA201"),
             ("Incassato", "CA305"),
             ("IncassatoRicarica", "DA401 + DB401"),
-            ("IncassatoVendita", "CA305 - CA1002 - DA401 + DB401"),
+            ("IncassatoVendita", "CA305 - CA1002 - DA401 - DB401"),
             ("___________________________________________________________________",""),
         ]
         return cumulative_newformula_values
@@ -230,3 +230,92 @@ class GlobalState:
             ("TotaleIncassatoBillValidator", "DA505 + DB505"),
         ]
         return cumulative_genericException_values
+    
+
+    def RicavaMarcaModelloGettoniera_(self):
+
+        MarcaModello = ""
+
+        # RICAVO MODELLO CPI
+        if self.CA102 != "":
+            if self.CA102 in ["CF8000EXEC", "CF8000MDB", "CF690", "CF6000EXEC", "EC6000MDB", "CF7900EXEC", "CF7900MDB"]:
+                MarcaModello = "MEI|" + self.CA102
+        print("NON E' CPI")
+
+        # RICAVO MODELLO COGES
+        if MarcaModello == "":
+            if self.ID102 != "":
+                if self.ID102 in ["93", "97", "77", "64", "76", "38", "30", "AETERNA", "85"]:
+                    MarcaModello = "COGES|" + self.ID102
+                    return MarcaModello + "|" + self.DXS03
+            elif self.CA101.startswith("COG"):
+                if self.CA403 == "":
+                    MarcaModello = "COGES|IDEA4COL" 
+                    return MarcaModello + "|" + self.DXS03
+        print("NON E' COGES")
+
+        # RICAVO MODELLO PAYTEC
+        if MarcaModello == "":
+            if self.ID102 != "":
+                if self.ID102.startswith("FAG"):
+                    # Controlla l'ultimo carattere di self.MA502
+                    if self.MA502[-1] in ["1", "2", "3", "4"]:
+                        MarcaModello = f"PAYTEC|PAYTECV{self.MA502[-1]}"
+                        return MarcaModello
+        print("NON E' PAYTEC")
+
+        # RICAVO MODELLO SUZOHAPP
+        if MarcaModello == "":
+            if self.CA102 != "":
+                if self.CA102.startswith("C2"):
+                    MarcaModello = "SUZ0HAPP|CURRENZA"
+                    return MarcaModello
+        print("NON E' SUZOHAPP|CURRENZA")
+
+        if self.ID102 != "":
+            if  self.ID102.startswith("WKL"):
+                MarcaModello = "SUZ0HAPP|WORLDKEY"
+                return MarcaModello
+            elif self.ID102.startswith("EKN"):
+                MarcaModello = "SUZ0HAPP|EURO KEY NEXT"
+                return MarcaModello
+         
+
+        if self.ID705 != "":
+            print("SUZ0HAPP|ID705")
+            if  self.ID705.startswith("WKL"):
+                MarcaModello = "SUZ0HAPP|WORLDKEY"
+                return MarcaModello
+            elif self.ID705.startswith("EKN"):
+                MarcaModello = "SUZ0HAPP|EURO KEY NEXT"
+                return MarcaModello
+            
+        print("NON E' SUZ0HAPP|WORLDKEY O SUZ0HAPP|EURO KEY NEXT")
+        
+        # RICAVO MODELLO ELKEY
+        if MarcaModello == "":
+            if self.DA102 != "" and self.DA102.startswith("1"):
+                MarcaModello = "ELKEY|BUBBLE"
+                return MarcaModello
+            if self.DA102 != "" and self.DA102 == "ELK Bubble":
+                MarcaModello = "ELKEY|BUBBLE"
+                return MarcaModello
+        
+        print("NON E' ELKEY")
+
+        # RICAVO MODELLO GENERICO
+        if isinstance(self.ID101, int):
+            self.ID101 = str(self.ID101) 
+
+        if self.ID101 != "" and not self.ID101[0].isdigit():
+            first_three_chars = self.ID101[:3]
+            MarcaModello = first_three_chars + "|XXX"
+        else:
+            if self.DXS01 != "":
+                first_three_chars = self.DXS01[:3]
+                MarcaModello = first_three_chars + "|XXX"
+            else:
+                MarcaModello = ""
+            
+
+        return MarcaModello
