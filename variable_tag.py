@@ -235,10 +235,10 @@ class GlobalState:
             ("TotaleResoManualeTubiResto", f"{convert_to_decimal(self.CA404)}€"),
             ("TotaleCaricatoManualeTubiResto", f"{convert_to_decimal(self.CA1002)}€"),
             ("LEGGENDA", ""),
-            ("TotaleResoTubiResto", "DA503 + DB503"),
-            ("TotaleCaricatoTubiResto", "CA702"),
-            ("TotaleResoManualeTubiResto", "CA706 + DA507 + DB507"),
-            ("TotaleCaricatoManualeTubiResto", "DA301 + DB301"),
+            ("TotaleResoTubiResto", "CA403"),
+            ("TotaleCaricatoTubiResto", "CA307"),
+            ("TotaleResoManualeTubiResto", "CA404"),
+            ("TotaleCaricatoManualeTubiResto", "CA1002"),
         ]
         return cumulative_genericException_values
     
