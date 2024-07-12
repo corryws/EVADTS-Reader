@@ -3,14 +3,27 @@ from function import convert_to_decimal, valida_scelta_campo
 
 class GlobalState:
     def __init__(self):
-        self.ID101 = self.CA101 = self.EA302 = self.EA303 = self.EA305 = self.EA306 = self.EA301 = self.ID102 = self.ID705 = self.DA102 = self.MA502 = self.DXS03 = self.CA102 = self.DXS01 = ""
-        self.VA101 = self.VA301 = self.CA201 = self.DA201 = self.DA601 = self.DB601 = self.CA305 = self.DA401 = self.DB401 = self.CA1002 = self.CA307 = self.CA403 = self.CA404 = self.CA802 = 0
-        self.DA503 = self.DB503 = self.CA702 = self.CA706 = self.DA507 = self.DB507 = self.DB201 = self.TA201 = self.TA205 = self.DA301 = self.DB301 = self.DB505 = self.DA505 = 0
+        self.CA1002 = self.CA101 = self.CA102 = self.CA201 = self.CA305 = self.CA307 = self.CA403 = self.CA404 = self.CA702 = self.CA706 = self.CA802 = 0
+        self.DA102 = self.DA201 = self.DA301 = self.DA401 = self.DA503 = self.DA505 = self.DA507 = self.DA601 = 0
+        self.DB201 = self.DB301 = self.DB401 = self.DB503 = self.DB505 = self.DB507 = self.DB601 = 0
+        self.DXS01 = self.DXS03 = ""
+        self.EA301 = self.EA302 = self.EA303 = self.EA305 = self.EA306 = ""
+        self.ID101 = self.ID102 = self.ID705 = ""
+        self.MA502 = ""
+        self.TA201 = self.TA205 = 0
+        self.VA101 = self.VA301 = 0
 
     def azzera(self):
-        self.ID101 = self.CA101 = self.EA302 = self.EA303 = self.EA305 = self.EA306 = self.EA301 = self.ID102 = self.ID705 = self.DA102 = self.MA502 = self.DXS03 = self.CA102 = self.DXS01 = ""
-        self.VA101 = self.VA301 = self.CA201 = self.DA201 = self.DA601 = self.DB601 = self.CA305 = self.DA401 = self.DB401 = self.CA1002 = self.CA307 = self.CA403 = self.CA404 = self.CA802 = 0
-        self.DA503 = self.DB503 = self.CA702 = self.CA706 = self.DA507 = self.DB507 = self.DB201 = self.TA201 = self.TA205 = self.DA301 = self.DB301 = self.DB505 = self.DA505 = 0
+        self.CA1002 = self.CA101 = self.CA102 = self.CA201 = self.CA305 = self.CA307 = self.CA403 = self.CA404 = self.CA702 = self.CA706 = self.CA802 = 0
+        self.DA102 = self.DA201 = self.DA301 = self.DA401 = self.DA503 = self.DA505 = self.DA507 = self.DA601 = 0
+        self.DB201 = self.DB301 = self.DB401 = self.DB503 = self.DB505 = self.DB507 = self.DB601 = 0
+        self.DXS01 = self.DXS03 = ""
+        self.EA301 = self.EA302 = self.EA303 = self.EA305 = self.EA306 = ""
+        self.ID101 = self.ID102 = self.ID705 = ""
+        self.MA502 = ""
+        self.TA201 = self.TA205 = 0
+        self.VA101 = self.VA301 = 0
+
 
     def returnNewFormulaList(self):
         cumulative_newformula_values = [
@@ -217,17 +230,15 @@ class GlobalState:
     def returnGenericExceptionList(self):
         cumulative_genericException_values = [
             ("VALORI CUMULATI DELLA MACCHINA IDENTICI PER TUTTE LE ECCEZIONI", ""),
-            ("TotaleResoTubiResto", f"{convert_to_decimal(self.DA503 + self.DB503)}€"),
-            ("TotalePrelevatoTubiResto", f"{convert_to_decimal(self.CA702)}€"),
-            ("TotaleCaricatoTubiResto", f"{convert_to_decimal(self.CA706 + self.DA507 + self.DB507)}€"),
-            ("TotaleIncassatoMeccanico", f"{convert_to_decimal(self.DA301 + self.DB301)}€"),
-            ("TotaleIncassatoBillValidator", f"{convert_to_decimal(self.DA505 + self.DB505)}€"),
+            ("TotaleResoTubiResto", f"{convert_to_decimal(self.CA403)}€"),
+            ("TotaleCaricatoTubiResto", f"{convert_to_decimal(self.CA307)}€"),
+            ("TotaleResoManualeTubiResto", f"{convert_to_decimal(self.CA404)}€"),
+            ("TotaleCaricatoManualeTubiResto", f"{convert_to_decimal(self.CA1002)}€"),
             ("LEGGENDA", ""),
             ("TotaleResoTubiResto", "DA503 + DB503"),
-            ("TotalePrelevatoTubiResto", "CA702"),
-            ("TotaleCaricatoTubiResto", "CA706 + DA507 + DB507"),
-            ("TotaleIncassatoMeccanico", "DA301 + DB301"),
-            ("TotaleIncassatoBillValidator", "DA505 + DB505"),
+            ("TotaleCaricatoTubiResto", "CA702"),
+            ("TotaleResoManualeTubiResto", "CA706 + DA507 + DB507"),
+            ("TotaleCaricatoManualeTubiResto", "DA301 + DB301"),
         ]
         return cumulative_genericException_values
     
